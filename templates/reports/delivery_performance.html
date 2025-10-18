@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Delivery Performance - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-truck text-secondary"></i>
+            Delivery Performance Report
+        </h2>
+        <div>
+            <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Reports
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                Print Report
+            </button>
+        </div>
+    </div>
+
+    <div class="alert alert-success">
+        <i class="fas fa-shipping-fast"></i>
+        <strong>Delivery Performance</strong> - Delivery times, success rates, and efficiency metrics.
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Total Deliveries</h6>
+                    <h3>{{ stats.total_deliveries }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Completed</h6>
+                    <h3>{{ stats.completed_deliveries }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title">On-Time %</h6>
+                    <h3>{{ stats.on_time_percentage }}%</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Avg Delay (min)</h6>
+                    <h3>{{ stats.avg_delivery_delay }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Staff Performance -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Staff Performance</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats.staff_performance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Staff Name</th>
+                                    <th>Department</th>
+                                    <th>Assigned</th>
+                                    <th>Completed</th>
+                                    <th>Success Rate</th>
+                                    <th>Avg Delay (min)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for staff in stats.staff_performance %}
+                                <tr>
+                                    <td>{{ staff.staff_name }}</td>
+                                    <td><span class="badge bg-secondary">{{ staff.department }}</span></td>
+                                    <td>{{ staff.total_assigned }}</td>
+                                    <td><span class="badge bg-success">{{ staff.completed }}</span></td>
+                                    <td>
+                                        {% set success_rate = (staff.completed / staff.total_assigned * 100) if staff.total_assigned > 0 else 0 %}
+                                        <strong>{{ "%.1f"|format(success_rate) }}%</strong>
+                                    </td>
+                                    <td>
+                                        {% if staff.avg_delay_minutes %}
+                                        <span class="badge {% if staff.avg_delay_minutes > 0 %}bg-danger{% else %}bg-success{% endif %}">
+                                            {{ "%.1f"|format(staff.avg_delay_minutes) }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No staff performance data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Distribution -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Status Distribution</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats.status_distribution %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for status, count in stats.status_distribution.items() %}
+                                <tr>
+                                    <td>
+                                        {% if status == 'Delivered' %}
+                                        <span class="badge bg-success">{{ status }}</span>
+                                        {% elif status == 'In Transit' %}
+                                        <span class="badge bg-info">{{ status }}</span>
+                                        {% elif status == 'Pending' %}
+                                        <span class="badge bg-warning">{{ status }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>{{ count }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No status data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Trends -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-line"></i> Monthly Delivery Trends</h5>
+        </div>
+        <div class="card-body">
+            {% if stats.monthly_trends %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Total Deliveries</th>
+                            <th>Completed</th>
+                            <th>Completion Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trend in stats.monthly_trends %}
+                        <tr>
+                            <td>{{ trend.month }}</td>
+                            <td><span class="badge bg-primary">{{ trend.total_deliveries }}</span></td>
+                            <td><span class="badge bg-success">{{ trend.completed_deliveries }}</span></td>
+                            <td>
+                                {% set completion_rate = (trend.completed_deliveries / trend.total_deliveries * 100) if trend.total_deliveries > 0 else 0 %}
+                                <strong>{{ "%.1f"|format(completion_rate) }}%</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No monthly trend data available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Order Successful - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body text-center py-5">
+                    <!-- Success Animation -->
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle fa-5x text-success"></i>
+                    </div>
+                    
+                    <h1 class="text-success mb-3">Order Placed Successfully!</h1>
+                    <p class="lead text-muted mb-4">
+                        Thank you for your order. Your delicious meal is being prepared with care.
+                    </p>
+                    
+                    <!-- Order Details Card -->
+                    <div class="card border-success mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-receipt"></i> Order Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Order ID:</strong> #{{ order.order_id }}</p>
+                                    <p><strong>Order Date:</strong> {{ order.order_date.strftime('%B %d, %Y at %H:%M') }}</p>
+                                    <p><strong>Status:</strong> 
+                                        <span class="badge bg-info">{{ order.status.title() }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Total Amount:</strong> 
+                                        <span class="text-success h5">₹{{ "%.2f"|format(order.total_amount|float) }}</span>
+                                    </p>
+                                    <p><strong>Payment:</strong> 
+                                        <span class="badge bg-success">Completed</span>
+                                    </p>
+                                    <p><strong>Estimated Delivery:</strong> 
+                                        {% if order.estimated_time %}
+                                        {{ order.estimated_time.strftime('%I:%M %p') }}
+                                        {% else %}
+                                        30-45 minutes
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Items -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Items Ordered</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for detail in order.order_details %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ detail.menu_item.name }}</strong>
+                                                {% if detail.special_instructions %}
+                                                <br><small class="text-info">{{ detail.special_instructions }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ detail.quantity }}</td>
+                                            <td>₹{{ "%.2f"|format(detail.unit_price|float) }}</td>
+                                            <td>₹{{ "%.2f"|format(detail.sub_total|float) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Address -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Delivery Address</h6>
+                        </div>
+                        <div class="card-body">
+                            <address>
+                                <i class="fas fa-map-marker-alt text-primary"></i>
+                                {{ order.delivery_address }}
+                            </address>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <a href="{{ url_for('orders.list_orders') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-list"></i> View All Orders
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="{{ url_for('delivery.track_delivery', order_id=order.order_id) }}" class="btn btn-success w-100">
+                                <i class="fas fa-truck"></i> Track Order
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="{{ url_for('menu.list_menu') }}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-utensils"></i> Order Again
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- What's Next Section -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-clock"></i> What Happens Next?
+                    </h5>
+                    <div class="timeline">
+                        <div class="timeline-item active">
+                            <div class="timeline-marker">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Order Confirmed</h6>
+                                <p class="text-muted small">Your order has been confirmed and payment received.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Preparing Your Food</h6>
+                                <p class="text-muted small">Our chefs are preparing your delicious meal.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">
+                                <i class="fas fa-motorcycle"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Out for Delivery</h6>
+                                <p class="text-muted small">Your order will be dispatched for delivery.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Delivered</h6>
+                                <p class="text-muted small">Enjoy your meal!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.timeline {
+    position: relative;
+    padding: 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 20px;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 35px;
+    height: 30px;
+    width: 2px;
+    background-color: #dee2e6;
+}
+
+.timeline-item.active::before {
+    background-color: #28a745;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #6c757d;
+}
+
+.timeline-item.active .timeline-marker {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.fa-check-circle {
+    animation: pulse 2s infinite;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Add Kitchen Staff - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-plus text-success"></i>
+                        Add Kitchen Staff
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <!-- Personal Information -->
+                        <h5 class="mb-3 text-primary">
+                            <i class="fas fa-user"></i>
+                            Personal Information
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username *</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="full_name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="emergency_contact" class="form-label">Emergency Contact</label>
+                                <input type="tel" class="form-control" id="emergency_contact" name="emergency_contact">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Employment Information -->
+                        <h5 class="mb-3 text-warning">
+                            <i class="fas fa-briefcase"></i>
+                            Employment Information
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="position" class="form-label">Position *</label>
+                                <select class="form-control" id="position" name="position" required>
+                                    <option value="">Select Position</option>
+                                    <option value="Head Chef">Head Chef</option>
+                                    <option value="Sous Chef">Sous Chef</option>
+                                    <option value="Line Cook">Line Cook</option>
+                                    <option value="Prep Cook">Prep Cook</option>
+                                    <option value="Kitchen Assistant">Kitchen Assistant</option>
+                                    <option value="Dishwasher">Dishwasher</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="shift" class="form-label">Work Shift *</label>
+                                <select class="form-control" id="shift" name="shift" required>
+                                    <option value="">Select Shift</option>
+                                    <option value="Morning (6AM - 2PM)">Morning (6AM - 2PM)</option>
+                                    <option value="Evening (2PM - 10PM)">Evening (2PM - 10PM)</option>
+                                    <option value="Night (10PM - 6AM)">Night (10PM - 6AM)</option>
+                                    <option value="Split Shift">Split Shift</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="hire_date" class="form-label">Hire Date *</label>
+                                <input type="date" class="form-control" id="hire_date" name="hire_date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="salary" class="form-label">Salary ($)</label>
+                                <input type="number" class="form-control" id="salary" name="salary" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="experience_years" class="form-label">Years of Experience</label>
+                                <input type="number" class="form-control" id="experience_years" name="experience_years" min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label">Employment Status</label>
+                                <select class="form-control" id="status" name="status">
+                                    <option value="Active">Active</option>
+                                    <option value="On Leave">On Leave</option>
+                                    <option value="Terminated">Terminated</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Skills and Certifications -->
+                        <h5 class="mb-3 text-info">
+                            <i class="fas fa-certificate"></i>
+                            Skills & Certifications
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="specialties" class="form-label">Culinary Specialties</label>
+                                <textarea class="form-control" id="specialties" name="specialties" rows="3" 
+                                         placeholder="e.g., Italian cuisine, Pastry, Grilling..."></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="certifications" class="form-label">Certifications</label>
+                                <textarea class="form-control" id="certifications" name="certifications" rows="3" 
+                                         placeholder="e.g., Food Safety, ServSafe, Culinary Arts..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="food_safety_cert" name="food_safety_cert">
+                                    <label class="form-check-label" for="food_safety_cert">
+                                        Food Safety Certified
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="serv_safe_cert" name="serv_safe_cert">
+                                    <label class="form-check-label" for="serv_safe_cert">
+                                        ServSafe Certified
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="can_supervise" name="can_supervise">
+                                    <label class="form-check-label" for="can_supervise">
+                                        Can Supervise Others
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('kitchen.list_kitchen_staff') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Kitchen Staff
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i>
+                                Add Staff Member
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set today's date as default hire date
+    const hireDateInput = document.getElementById('hire_date');
+    const today = new Date().toISOString().split('T')[0];
+    hireDateInput.value = today;
+    
+    // Position-based salary suggestions
+    const positionSelect = document.getElementById('position');
+    const salaryInput = document.getElementById('salary');
+    
+    const salaryRanges = {
+        'Head Chef': 50000,
+        'Sous Chef': 40000,
+        'Line Cook': 30000,
+        'Prep Cook': 25000,
+        'Kitchen Assistant': 22000,
+        'Dishwasher': 20000
+    };
+    
+    positionSelect.addEventListener('change', function() {
+        const position = this.value;
+        if (position && salaryRanges[position] && !salaryInput.value) {
+            salaryInput.value = salaryRanges[position];
+        }
+    });
+});
+</script>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid #dee2e6;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+hr {
+    border-color: #dee2e6;
+}
+
+h5 {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f8f9fa;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Menu Item - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-edit text-primary"></i>
+                        Edit Menu Item
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="item_name" class="form-label">Item Name *</label>
+                                <input type="text" class="form-control" id="item_name" name="item_name" value="{{ menu_item.name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Appetizers" {% if menu_item.category == 'Appetizers' %}selected{% endif %}>Appetizers</option>
+                                    <option value="Main Course" {% if menu_item.category == 'Main Course' %}selected{% endif %}>Main Course</option>
+                                    <option value="Desserts" {% if menu_item.category == 'Desserts' %}selected{% endif %}>Desserts</option>
+                                    <option value="Beverages" {% if menu_item.category == 'Beverages' %}selected{% endif %}>Beverages</option>
+                                    <option value="Salads" {% if menu_item.category == 'Salads' %}selected{% endif %}>Salads</option>
+                                    <option value="Soups" {% if menu_item.category == 'Soups' %}selected{% endif %}>Soups</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">Price ($) *</label>
+                                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="{{ menu_item.price }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="availability" class="form-label">Availability *</label>
+                                <select class="form-control" id="availability" name="availability" required>
+                                    <option value="Available" {% if menu_item.availability %}selected{% endif %}>Available</option>
+                                    <option value="Unavailable" {% if not menu_item.availability %}selected{% endif %}>Unavailable</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe the menu item...">{{ menu_item.description or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Item Image Path</label>
+                            <input type="text" class="form-control" id="image" name="image" value="{{ menu_item.image or '' }}" placeholder="e.g., images/menu/burger.jpg">
+                            <div class="form-text">Enter the image path or URL</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_vegetarian" name="is_vegetarian" {% if menu_item.is_vegetarian %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_vegetarian">
+                                        <i class="fas fa-leaf text-success"></i> Vegetarian
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_spicy" name="is_spicy" {% if menu_item.is_spicy %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_spicy">
+                                        <i class="fas fa-fire text-danger"></i> Spicy
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_popular" name="is_popular" {% if menu_item.is_popular %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_popular">
+                                        <i class="fas fa-star text-info"></i> Popular
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_new" name="is_new" {% if menu_item.is_new %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_new">
+                                        <i class="fas fa-sparkles text-warning"></i> New Item
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="discount" class="form-label">Discount (%)</label>
+                                <input type="number" class="form-control" id="discount" name="discount" step="0.01" min="0" max="100" value="{{ menu_item.discount or 0 }}" placeholder="e.g., 10">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('menu.list_menu') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Menu
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Update Menu Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid #dee2e6;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.card-title {
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+}
+</style>
+{% endblock %}

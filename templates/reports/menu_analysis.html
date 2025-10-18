@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Menu Analysis - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-hamburger text-success"></i>
+            Menu Analysis Report
+        </h2>
+        <div>
+            <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Reports
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                Print Report
+            </button>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="fas fa-utensils"></i>
+        <strong>Menu Analysis</strong> - Popular items, categories, and inventory insights.
+    </div>
+
+    <!-- Top Selling Items -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-star"></i> Top Selling Items</h5>
+        </div>
+        <div class="card-body">
+            {% if top_items %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Units Sold</th>
+                            <th>Orders</th>
+                            <th>Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in top_items %}
+                        <tr>
+                            <td><strong>#{{ loop.index }}</strong></td>
+                            <td>{{ item.name }}</td>
+                            <td><span class="badge bg-secondary">{{ item.category }}</span></td>
+                            <td>{{ "%.2f"|format(item.price) }}</td>
+                            <td><span class="badge bg-primary">{{ item.total_sold }}</span></td>
+                            <td>{{ item.order_count }}</td>
+                            <td><strong>{{ "%.2f"|format(item.total_revenue) }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No sales data available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Category Performance -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-layer-group"></i> Category Performance</h5>
+        </div>
+        <div class="card-body">
+            {% if category_performance %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Items Count</th>
+                            <th>Units Sold</th>
+                            <th>Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cat in category_performance %}
+                        <tr>
+                            <td><span class="badge bg-info">{{ cat.category }}</span></td>
+                            <td>{{ cat.items_count }}</td>
+                            <td><strong>{{ cat.total_sold }}</strong></td>
+                            <td><strong>{{ "%.2f"|format(cat.total_revenue) }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No category data available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Price Analysis -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Price Range Analysis</h5>
+                </div>
+                <div class="card-body">
+                    {% if price_analysis %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Price Range</th>
+                                    <th>Units Sold</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for price in price_analysis %}
+                                <tr>
+                                    <td>{{ price.price_range }}</td>
+                                    <td><strong>{{ price.total_sold }}</strong></td>
+                                    <td><strong>{{ "%.2f"|format(price.total_revenue) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No price analysis data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Performing Items -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Low Performing Items</h5>
+                </div>
+                <div class="card-body">
+                    {% if low_performing %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Units Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in low_performing %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td><span class="badge bg-secondary">{{ item.category }}</span></td>
+                                    <td>{{ "%.2f"|format(item.price) }}</td>
+                                    <td><span class="badge bg-danger">{{ item.total_sold }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">All items are performing well!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

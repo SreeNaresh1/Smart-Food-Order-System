@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}View Kitchen Staff - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-user-circle text-info"></i>
+                            Kitchen Staff Details
+                        </h3>
+                        <div>
+                            <a href="{{ url_for('kitchen.edit_kitchen_staff', user_id=staff.user_id) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{{ url_for('kitchen.list_kitchen_staff') }}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-user"></i>
+                                Personal Information
+                            </h5>
+                            
+                            <div class="info-group mb-3">
+                                <label class="text-muted">Staff ID:</label>
+                                <div class="info-value">{{ staff.user_id }}</div>
+                            </div>
+
+                            <div class="info-group mb-3">
+                                <label class="text-muted">Full Name:</label>
+                                <div class="info-value">{{ staff.name }}</div>
+                            </div>
+
+                            <div class="info-group mb-3">
+                                <label class="text-muted">Email Address:</label>
+                                <div class="info-value">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                    {{ staff.email }}
+                                </div>
+                            </div>
+
+                            <div class="info-group mb-3">
+                                <label class="text-muted">Phone Number:</label>
+                                <div class="info-value">
+                                    <i class="fas fa-phone text-success"></i>
+                                    {{ staff.phone }}
+                                </div>
+                            </div>
+
+                            <div class="info-group mb-3">
+                                <label class="text-muted">Role:</label>
+                                <div class="info-value">
+                                    <span class="badge bg-info">{{ staff.role }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <h5 class="text-warning mb-3">
+                                <i class="fas fa-info-circle"></i>
+                                Additional Information
+                            </h5>
+
+                            <div class="info-group mb-3">
+                                <label class="text-muted">Address:</label>
+                                <div class="info-value">
+                                    {% if staff.address %}
+                                        <i class="fas fa-map-marker-alt text-danger"></i>
+                                        {{ staff.address }}
+                                    {% else %}
+                                        <span class="text-muted">Not provided</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="info-group mb-3">
+                                <label class="text-muted">Member Since:</label>
+                                <div class="info-value">
+                                    <i class="fas fa-calendar-alt text-primary"></i>
+                                    {{ staff.created_date.strftime('%B %d, %Y') if staff.created_date else 'N/A' }}
+                                </div>
+                            </div>
+
+                            <div class="info-group mb-3">
+                                <label class="text-muted">Account Status:</label>
+                                <div class="info-value">
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('kitchen.list_kitchen_staff') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Staff List
+                        </a>
+                        <div>
+                            <a href="{{ url_for('kitchen.edit_kitchen_staff', user_id=staff.user_id) }}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                                Edit Staff
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid #dee2e6;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.info-group {
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    border-left: 3px solid #007bff;
+}
+
+.info-group label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: #495057;
+}
+
+h5 {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+hr {
+    border-color: #dee2e6;
+}
+
+.badge {
+    font-size: 0.875rem;
+    padding: 0.35rem 0.65rem;
+}
+</style>
+{% endblock %}

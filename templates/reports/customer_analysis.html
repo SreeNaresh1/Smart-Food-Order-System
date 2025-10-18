@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Analysis - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-user-friends text-warning"></i>
+            Customer Analysis Report
+        </h2>
+        <div>
+            <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Reports
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                Print Report
+            </button>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <i class="fas fa-users"></i>
+        <strong>Customer Analysis</strong> - Customer behavior, loyalty, and demographics.
+    </div>
+
+    <div class="row">
+        <!-- Top Customers by Orders -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Top Customers by Orders</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_customers_orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Customer</th>
+                                    <th>Orders</th>
+                                    <th>Total Spent</th>
+                                    <th>Avg Order</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in top_customers_orders %}
+                                <tr>
+                                    <td><strong>#{{ loop.index }}</strong></td>
+                                    <td>
+                                        {{ customer.name }}<br>
+                                        <small class="text-muted">{{ customer.email }}</small>
+                                    </td>
+                                    <td><span class="badge bg-primary">{{ customer.total_orders }}</span></td>
+                                    <td><strong>{{ "%.2f"|format(customer.total_spent) }}</strong></td>
+                                    <td>{{ "%.2f"|format(customer.avg_order_value) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No customer data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Customers by Spending -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Top Customers by Spending</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_customers_spending %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Customer</th>
+                                    <th>Orders</th>
+                                    <th>Total Spent</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in top_customers_spending %}
+                                <tr>
+                                    <td><strong>#{{ loop.index }}</strong></td>
+                                    <td>
+                                        {{ customer.name }}<br>
+                                        <small class="text-muted">{{ customer.email }}</small>
+                                    </td>
+                                    <td>{{ customer.total_orders }}</td>
+                                    <td><strong>{{ "%.2f"|format(customer.total_spent) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No customer data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Customer Registration Trends -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Registration Trends (Last 12 Months)</h5>
+                </div>
+                <div class="card-body">
+                    {% if registration_trends %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>New Customers</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trend in registration_trends %}
+                                <tr>
+                                    <td>{{ trend.month }}</td>
+                                    <td><span class="badge bg-info">{{ trend.new_customers }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No registration data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Frequency Distribution -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-user-check"></i> Customer Loyalty Distribution</h5>
+                </div>
+                <div class="card-body">
+                    {% if order_frequency %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Customer Type</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for freq in order_frequency %}
+                                <tr>
+                                    <td>
+                                        {% if 'Loyal' in freq.customer_type %}
+                                        <span class="badge bg-success">{{ freq.customer_type }}</span>
+                                        {% elif 'Regular' in freq.customer_type %}
+                                        <span class="badge bg-primary">{{ freq.customer_type }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ freq.customer_type }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>{{ freq.customer_count }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No frequency data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,561 @@
+{% extends "base.html" %}
+
+{% block title %}Supervisor Dashboard - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<style>
+    /* Supervisor welcome box with vibrant gradient */
+    .supervisor-welcome-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Override global table styles - ensure table header styling matches delivery table */
+    .supervisor-dashboard .table thead.table-dark th {
+        background-color: #343a40 !important;
+        color: #ffffff !important;
+        border-color: #454d55 !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        font-size: 0.85rem !important;
+        padding: 12px 8px !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    /* Ensure table text visibility for supervisor dashboard */
+    .supervisor-dashboard .table tbody tr td {
+        color: #212529 !important;
+        background-color: #ffffff !important;
+    }
+    .supervisor-dashboard .table tbody tr td h6,
+    .supervisor-dashboard .table tbody tr td strong,
+    .supervisor-dashboard .table tbody tr td div:not(.badge):not(.btn-group):not(.progress):not(.progress-bar) {
+        color: #212529 !important;
+    }
+    .supervisor-dashboard .table tbody tr:hover {
+        background-color: #f8f9fa !important;
+    }
+    .supervisor-dashboard .table tbody tr:hover td {
+        background-color: #f8f9fa !important;
+    }
+</style>
+<div class="container-fluid supervisor-dashboard">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="supervisor-welcome-box text-white rounded p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="mb-1"><i class="fas fa-user-cog"></i> Supervisor Dashboard</h1>
+                        <p class="mb-0 opacity-75">Welcome, {{ user.name }} - Overseeing Operations</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="mb-0 opacity-75">{{ current_time }}</p>
+                        <span class="badge bg-light text-primary">{{ user.role.title() }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Total Orders</h6>
+                            <h3 class="mb-0">{{ stats.total_orders or 0 }}</h3>
+                        </div>
+                        <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Pending</h6>
+                            <h3 class="mb-0">{{ stats.pending_orders or 0 }}</h3>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Preparing</h6>
+                            <h3 class="mb-0">{{ stats.preparing_orders or 0 }}</h3>
+                        </div>
+                        <i class="fas fa-fire fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Ready</h6>
+                            <h3 class="mb-0">{{ stats.ready_orders or 0 }}</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Staff</h6>
+                            <h3 class="mb-0">{{ stats.total_employees or 0 }}</h3>
+                        </div>
+                        <i class="fas fa-users fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+            <div class="card bg-dark text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Revenue</h6>
+                            <h3 class="mb-0">₹{{ "%.0f"|format(stats.total_revenue or 0) }}</h3>
+                        </div>
+                        <i class="fas fa-rupee-sign fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Employee Monitoring -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-users-cog"></i> Employee Monitoring</h5>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{{ url_for('users.list_users') }}" class="btn btn-light btn-sm">
+                            <i class="fas fa-users"></i> Manage Staff
+                        </a>
+                        <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-light btn-sm">
+                            <i class="fas fa-chart-bar"></i> Reports
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if stats.employees %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Orders Assigned</th>
+                                    <th>Performance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in stats.employees %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-user-circle fa-2x text-muted me-2"></i>
+                                            <div>
+                                                <h6 class="mb-0">{{ employee.name }}</h6>
+                                                <small class="text-muted">{{ employee.email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-info">{{ employee.role.title() }}</span></td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-circle"></i> Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ employee.assigned_orders or 0 }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ (employee.performance_score or 75) }}%"
+                                                 aria-valuenow="{{ employee.performance_score or 75 }}" 
+                                                 aria-valuemin="0" aria-valuemax="100">
+                                                {{ employee.performance_score or 75 }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('users.view_user', user_id=employee.user_id) }}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('users.edit_user', user_id=employee.user_id) }}" 
+                                               class="btn btn-outline-info btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No employees found</h5>
+                        <p class="text-muted">Add staff members to monitor their performance</p>
+                        <a href="{{ url_for('users.add_user') }}" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Add Employee
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Reports -->
+        <div class="col-lg-4">
+            <!-- Supervisor Tools -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-tools"></i> Supervisor Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('orders.list_orders') }}" class="btn btn-primary">
+                            <i class="fas fa-clipboard-list"></i> Order Management
+                        </a>
+                        <a href="{{ url_for('orders.list_orders', status='preparing') }}" class="btn btn-warning">
+                            <i class="fas fa-utensils"></i> Kitchen Overview
+                        </a>
+                        <a href="{{ url_for('delivery.list_deliveries') }}" class="btn btn-info">
+                            <i class="fas fa-truck"></i> Delivery Tracking
+                        </a>
+                        <a href="{{ url_for('feedback.list_feedback') }}" class="btn btn-secondary">
+                            <i class="fas fa-comments"></i> Customer Feedback
+                        </a>
+                        <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-success">
+                            <i class="fas fa-chart-pie"></i> Reports Dashboard
+                        </a>
+                        <a href="{{ url_for('menu.list_menu') }}" class="btn btn-dark">
+                            <i class="fas fa-book"></i> Menu Management
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Summary -->
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Performance Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small">Order Completion Rate</span>
+                            <span class="small">{{ stats.completion_rate or 95 }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: {{ stats.completion_rate or 95 }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small">Customer Satisfaction</span>
+                            <span class="small">{{ stats.satisfaction_rate or 88 }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" style="width: {{ stats.satisfaction_rate or 88 }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small">On-Time Delivery</span>
+                            <span class="small">{{ stats.delivery_rate or 92 }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" style="width: {{ stats.delivery_rate or 92 }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <div class="text-center">
+                        <h6 class="text-success">Overall Performance: Excellent</h6>
+                        <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fas fa-analytics"></i> View All Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities & Order Management -->
+    <div class="row mt-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Recent Order Activities</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-light btn-sm" onclick="refreshOrders()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <a href="{{ url_for('orders.list_orders') }}" class="btn btn-light btn-sm">
+                            <i class="fas fa-list"></i> View All
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if stats.recent_orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Status</th>
+                                    <th>Time</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in stats.recent_orders %}
+                                <tr>
+                                    <td><strong>#{{ order.order_id }}</strong></td>
+                                    <td>{{ order.customer.name }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if order.status == 'Delivered' else 'warning' if order.status == 'Pending' else 'info' }}">
+                                            {{ order.status.title() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.order_date.strftime('%H:%M') }}</td>
+                                    <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('orders.view_order', order_id=order.order_id) }}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if order.status in ['pending', 'confirmed', 'preparing'] %}
+                                            <button class="btn btn-outline-warning btn-sm" 
+                                                    onclick="updateOrderStatus({{ order.order_id }}, 'priority')">
+                                                <i class="fas fa-exclamation"></i>
+                                            </button>
+                                            {% endif %}
+                                            <button class="btn btn-outline-info btn-sm" 
+                                                    onclick="assignOrder({{ order.order_id }})">
+                                                <i class="fas fa-user-plus"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No recent orders</h5>
+                        <p class="text-muted">Orders will appear here as they come in</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status & Alerts -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-bell"></i> System Alerts & Status</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Critical Alerts -->
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Order Backlog:</strong> {{ stats.pending_orders or 0 }} orders pending approval.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    {% if (stats.preparing_orders or 0) > 5 %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>High Volume:</strong> {{ stats.preparing_orders }} orders in preparation.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- System Status -->
+                    <h6 class="mt-3 mb-2">System Status</h6>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="small">Kitchen Operations</span>
+                            <span class="badge bg-success">Online</span>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="small">Delivery Service</span>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="small">Payment Gateway</span>
+                            <span class="badge bg-success">Connected</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="small">Staff Available</span>
+                            <span class="badge bg-info">{{ stats.active_staff or stats.total_employees or 0 }}/{{ stats.total_employees or 0 }}</span>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <div class="text-center">
+                        <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="fas fa-chart-bar"></i> View Full Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Assignment Modal -->
+<div class="modal fade" id="assignOrderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign Order to Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignOrderForm" method="POST" action="/orders/assign_employee">
+                    <input type="hidden" id="assignOrderId" name="order_id">
+                    <div class="mb-3">
+                        <label for="employeeSelect" class="form-label">Select Employee:</label>
+                        <select class="form-select" id="employeeSelect" name="employee_id" required>
+                            <option value="">Choose employee...</option>
+                            {% if stats.employees %}
+                                {% for employee in stats.employees %}
+                                <option value="{{ employee.user_id }}">{{ employee.name }} ({{ employee.role.title() }})</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority:</label>
+                        <select class="form-select" name="priority">
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="assignOrderForm" class="btn btn-primary">Assign Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh functionality
+setInterval(function() {
+    // Refresh page every 60 seconds for real-time monitoring
+    window.location.reload();
+}, 60000);
+
+// Order assignment functionality
+function assignOrder(orderId) {
+    document.getElementById('assignOrderId').value = orderId;
+    var modal = new bootstrap.Modal(document.getElementById('assignOrderModal'));
+    modal.show();
+}
+
+// Order status update
+function updateOrderStatus(orderId, action) {
+    if (confirm(`Are you sure you want to mark this order as ${action}?`)) {
+        fetch(`/orders/supervisor_update/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: action
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Order updated successfully', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert('Error updating order', 'danger');
+            }
+        });
+    }
+}
+
+// Refresh orders
+function refreshOrders() {
+    window.location.reload();
+}
+
+// Alert system
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 3000);
+}
+
+// Performance monitoring
+document.addEventListener('DOMContentLoaded', function() {
+    // Highlight critical metrics
+    const pendingOrders = {{ stats.pending_orders or 0 }};
+    if (pendingOrders > 5) {
+        showAlert(`Alert: ${pendingOrders} orders pending attention`, 'warning');
+    }
+});
+</script>
+{% endblock %}

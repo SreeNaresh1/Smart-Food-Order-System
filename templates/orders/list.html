@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-list"></i> 
+                    {% if session.user_role == 'Customer' %}My Orders{% else %}All Orders{% endif %}
+                </h1>
+                {% if session.user_role == 'Customer' %}
+                <a href="{{ url_for('menu.list_menu') }}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> New Order
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <form method="GET" class="d-flex">
+                <select name="status" class="form-control me-2">
+                    <option value="">All Statuses</option>
+                    {% for status in statuses %}
+                    <option value="{{ status }}" {% if current_status == status %}selected{% endif %}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-outline-primary">Filter</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Orders List -->
+    <div class="row">
+        {% if orders.items %}
+        {% for order in orders.items %}
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Order #{{ order.order_id }}</h6>
+                    <span class="badge 
+                        {% if order.status == 'Delivered' %}bg-success
+                        {% elif order.status == 'Pending' %}bg-warning
+                        {% elif order.status == 'Cancelled' %}bg-danger
+                        {% else %}bg-info{% endif %}">
+                        {{ order.status }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    {% if session.user_role != 'Customer' %}
+                    <p class="mb-2"><strong>Customer:</strong> {{ order.customer.name }}</p>
+                    {% endif %}
+                    <p class="mb-2"><strong>Date:</strong> {{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <p class="mb-2"><strong>Total:</strong> ₹{{ "%.2f"|format(order.total_amount) }}</p>
+                    {% if order.delivery_address %}
+                    <p class="mb-2 small"><strong>Address:</strong> {{ order.delivery_address[:50] }}...</p>
+                    {% endif %}
+                    
+                    <div class="btn-group w-100" role="group">
+                        <a href="{{ url_for('orders.view_order', order_id=order.order_id) }}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        {% if session.user_role == 'Customer' %}
+                            {% if order.status in ['Pending', 'Confirmed'] %}
+                            <form method="POST" action="{{ url_for('orders.cancel_order', order_id=order.order_id) }}" 
+                                  class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this order?')">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </form>
+                            {% elif order.status == 'delivered' %}
+                            <a href="{{ url_for('feedback.add_feedback_for_order', order_id=order.order_id) }}" 
+                               class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-star"></i> Feedback
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4>No orders found</h4>
+                    {% if session.user_role == 'Customer' %}
+                    <p class="text-muted">You haven't placed any orders yet.</p>
+                    <a href="{{ url_for('menu.list_menu') }}" class="btn btn-primary">
+                        <i class="fas fa-utensils"></i> Browse Menu
+                    </a>
+                    {% else %}
+                    <p class="text-muted">No orders in the system.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if orders.pages > 1 %}
+    <nav aria-label="Orders pagination">
+        <ul class="pagination justify-content-center">
+            {% if orders.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('orders.list_orders', page=orders.prev_num, status=current_status) }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for page in orders.iter_pages() %}
+                {% if page %}
+                    {% if page != orders.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('orders.list_orders', page=page, status=current_status) }}">{{ page }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page }}</span>
+                    </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            
+            {% if orders.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('orders.list_orders', page=orders.next_num, status=current_status) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

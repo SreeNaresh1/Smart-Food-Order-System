@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Add Menu Item - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-plus-circle text-success"></i>
+                        Add New Menu Item
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="item_name" class="form-label">Item Name *</label>
+                                <input type="text" class="form-control" id="item_name" name="item_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Appetizers">Appetizers</option>
+                                    <option value="Main Course">Main Course</option>
+                                    <option value="Desserts">Desserts</option>
+                                    <option value="Beverages">Beverages</option>
+                                    <option value="Salads">Salads</option>
+                                    <option value="Soups">Soups</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">Price ($) *</label>
+                                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="availability" class="form-label">Availability *</label>
+                                <select class="form-control" id="availability" name="availability" required>
+                                    <option value="Available">Available</option>
+                                    <option value="Unavailable">Unavailable</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe the menu item..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Item Image</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <div class="form-text">Upload an image for the menu item (optional)</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="prep_time" class="form-label">Preparation Time (minutes)</label>
+                                <input type="number" class="form-control" id="prep_time" name="prep_time" min="1" placeholder="e.g., 15">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="calories" class="form-label">Calories</label>
+                                <input type="number" class="form-control" id="calories" name="calories" min="0" placeholder="e.g., 350">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_vegetarian" name="is_vegetarian">
+                                    <label class="form-check-label" for="is_vegetarian">
+                                        <i class="fas fa-leaf text-success"></i> Vegetarian
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_spicy" name="is_spicy">
+                                    <label class="form-check-label" for="is_spicy">
+                                        <i class="fas fa-fire text-danger"></i> Spicy
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_popular" name="is_popular">
+                                    <label class="form-check-label" for="is_popular">
+                                        <i class="fas fa-star text-info"></i> Popular
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_new" name="is_new">
+                                    <label class="form-check-label" for="is_new">
+                                        <i class="fas fa-sparkles text-warning"></i> New Item
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="discount" class="form-label">Discount (%)</label>
+                                <input type="number" class="form-control" id="discount" name="discount" step="0.01" min="0" max="100" value="0" placeholder="e.g., 10">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('menu.list_menu') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Menu
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i>
+                                Add Menu Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid #dee2e6;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+</style>
+{% endblock %}

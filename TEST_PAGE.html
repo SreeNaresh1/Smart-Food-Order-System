@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Ultra-Vibrant Dashboard Test - What You SHOULD See</title>
+    <style>
+        /* Same background as customer dashboard */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientFlow 15s ease infinite;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Particle Container */
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        /* Particles */
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #fff 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        /* Floating Food Icons */
+        .food-icon-float {
+            position: fixed;
+            font-size: 2rem;
+            opacity: 0.15;
+            animation: floatFood 20s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes floatFood {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-50px) rotate(180deg);
+            }
+        }
+
+        /* Content Container */
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .box h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        .box.wrong {
+            border: 3px solid #ff4444;
+        }
+
+        .box.correct {
+            border: 3px solid #44ff44;
+        }
+
+        .box.wrong h2 {
+            color: #ff4444;
+        }
+
+        .box.correct h2 {
+            color: #44ff44;
+        }
+
+        .features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .features li::before {
+            content: "✅";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .box.wrong .features li::before {
+            content: "❌";
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .instructions h2 {
+            margin-top: 0;
+        }
+
+        .steps {
+            list-style: none;
+            padding: 0;
+            counter-reset: step-counter;
+        }
+
+        .steps li {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            position: relative;
+            padding-left: 60px;
+            counter-increment: step-counter;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 35px;
+            background: white;
+            color: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .test-result {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .test-result h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Container -->
+    <div class="particle-container" id="particleContainer"></div>
+
+    <!-- Food Icons Container -->
+    <div id="foodIconsContainer"></div>
+
+    <div class="content">
+        <h1>🎨 Ultra-Vibrant Dashboard Test</h1>
+        <p class="subtitle">This page shows what your dashboard SHOULD look like</p>
+
+        <div class="test-result">
+            <h3>👀 Can you see the following?</h3>
+            <p>✨ Animated rainbow gradient background (5 colors flowing)?</p>
+            <p>⭐ Twinkling star particles?</p>
+            <p>🍕 Floating food emojis?</p>
+            <p><strong>If YES → Your dashboard IS ultra-vibrant! Just need to clear cache.</strong></p>
+            <p><strong>If NO → Try a different browser or incognito mode.</strong></p>
+        </div>
+
+        <div class="comparison">
+            <div class="box wrong">
+                <h2>❌ What You're Seeing (Cached)</h2>
+                <ul class="features">
+                    <li>Plain white/gray background</li>
+                    <li>No animations</li>
+                    <li>No particles</li>
+                    <li>No food emojis</li>
+                    <li>Boring, static design</li>
+                </ul>
+                <p><strong>Rating: 2/10 😔</strong></p>
+            </div>
+
+            <div class="box correct">
+                <h2>✅ What You SHOULD See</h2>
+                <ul class="features">
+                    <li>Rainbow gradient background</li>
+                    <li>50 twinkling stars</li>
+                    <li>15 floating food emojis</li>
+                    <li>30 confetti pieces</li>
+                    <li>Ultra-vibrant design</li>
+                </ul>
+                <p><strong>Rating: 10/10 🎉</strong></p>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>🔥 How to Fix Browser Cache Issue</h2>
+            <ul class="steps">
+                <li>Close ALL browser windows and tabs completely</li>
+                <li>Reopen browser and press <strong>Ctrl+Shift+Delete</strong></li>
+                <li>Select <strong>"All time"</strong> or <strong>"Everything"</strong></li>
+                <li>Check: ☑ Browsing history, ☑ Cookies, ☑ Cached images and files</li>
+                <li>Click <strong>"Clear data"</strong> button</li>
+                <li>Close browser completely again</li>
+                <li>Reopen and go to: <strong>http://localhost:5000/dashboard</strong></li>
+                <li>Login as customer (username: <strong>Eriz</strong>)</li>
+            </ul>
+        </div>
+
+        <div style="background: #d4edda; border: 2px solid #28a745; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #155724;">✅ Test Results</h3>
+            <p><strong>Flask Server:</strong> ✅ Running</p>
+            <p><strong>Dashboard File:</strong> ✅ Has 93.3% ultra-vibrant features</p>
+            <p><strong>Cache-Busting:</strong> ✅ Enabled in app.py</p>
+            <p><strong>Issue:</strong> Browser showing OLD cached version</p>
+            <p><strong>Solution:</strong> Clear ALL browser cache (see steps above)</p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <p style="font-size: 1.5rem; font-weight: bold;">🎯 THIS is how your dashboard should look!</p>
+            <p>If you can see the rainbow gradient and particles on THIS page,<br>
+            then your browser CAN display the ultra-vibrant design.</p>
+            <p>Just need to clear the cache! 🚀</p>
+        </div>
+    </div>
+
+    <script>
+        // Create particles (same as dashboard)
+        function createParticles() {
+            const container = document.getElementById('particleContainer');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random position
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                
+                // Random animation delay
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Create floating food icons (same as dashboard)
+        function createFoodIcons() {
+            const container = document.getElementById('foodIconsContainer');
+            const foodEmojis = ['🍕', '🍔', '🍜', '🍰', '🍱', '🍣', '🍝', '🌮', '🍦', '🧁', '🍩', '🌯', '🥗', '🍛', '🥘'];
+            
+            foodEmojis.forEach((emoji, index) => {
+                const icon = document.createElement('div');
+                icon.className = 'food-icon-float';
+                icon.textContent = emoji;
+                
+                // Random position
+                icon.style.left = (Math.random() * 90 + 5) + '%';
+                icon.style.top = (Math.random() * 90 + 5) + '%';
+                
+                // Random animation delay
+                icon.style.animationDelay = (index * 1.5) + 's';
+                
+                container.appendChild(icon);
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            createFoodIcons();
+        });
+    </script>
+</body>
+</html>

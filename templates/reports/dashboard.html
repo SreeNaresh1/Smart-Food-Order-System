@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}Reports Dashboard - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-chart-bar text-info"></i>
+            Reports Dashboard
+        </h2>
+        <div>
+            <button class="btn btn-outline-primary" onclick="refreshReports()">
+                <i class="fas fa-sync-alt"></i>
+                Refresh Data
+            </button>
+            <div class="btn-group ms-2">
+                <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/reports/export/pdf"><i class="fas fa-file-pdf"></i> PDF Report</a></li>
+                    <li><a class="dropdown-item" href="/reports/export/excel"><i class="fas fa-file-excel"></i> Excel Report</a></li>
+                    <li><a class="dropdown-item" href="/reports/export/csv"><i class="fas fa-file-csv"></i> CSV Data</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                    <h5>Total Orders</h5>
+                    <h2>{{ stats.total_orders or 0 }}</h2>
+                    <small>All time</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                    <h5>Total Revenue</h5>
+                    <h2>{{ "%.0f"|format(stats.total_revenue or 0) }}</h2>
+                    <small>All time</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h5>Total Customers</h5>
+                    <h2>{{ stats.total_customers or 0 }}</h2>
+                    <small>Registered</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="fas fa-utensils fa-2x mb-2"></i>
+                    <h5>Menu Items</h5>
+                    <h2>{{ stats.total_menu_items or 0 }}</h2>
+                    <small>Available</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Navigation -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-line"></i>
+                        Available Reports
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-pie fa-3x text-primary mb-3"></i>
+                                    <h5>Sales Report</h5>
+                                    <p class="text-muted">Revenue analysis, trends, and performance metrics</p>
+                                    <a href="{{ url_for('reports.sales_report') }}" class="btn btn-primary">
+                                        <i class="fas fa-eye"></i>
+                                        View Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-hamburger fa-3x text-success mb-3"></i>
+                                    <h5>Menu Analysis</h5>
+                                    <p class="text-muted">Popular items, categories, and inventory insights</p>
+                                    <a href="{{ url_for('reports.menu_analysis') }}" class="btn btn-success">
+                                        <i class="fas fa-eye"></i>
+                                        View Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-friends fa-3x text-warning mb-3"></i>
+                                    <h5>Customer Analysis</h5>
+                                    <p class="text-muted">Customer behavior, loyalty, and demographics</p>
+                                    <a href="{{ url_for('reports.customer_analysis') }}" class="btn btn-warning">
+                                        <i class="fas fa-eye"></i>
+                                        View Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-comments fa-3x text-info mb-3"></i>
+                                    <h5>Feedback Summary</h5>
+                                    <p class="text-muted">Customer reviews, ratings, and satisfaction</p>
+                                    <a href="{{ url_for('reports.feedback_summary') }}" class="btn btn-info">
+                                        <i class="fas fa-eye"></i>
+                                        View Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-secondary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-truck fa-3x text-secondary mb-3"></i>
+                                    <h5>Delivery Performance</h5>
+                                    <p class="text-muted">Delivery times, success rates, and efficiency</p>
+                                    <a href="{{ url_for('reports.delivery_performance') }}" class="btn btn-secondary">
+                                        <i class="fas fa-eye"></i>
+                                        View Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-dark">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cog fa-3x text-dark mb-3"></i>
+                                    <h5>Overview Report</h5>
+                                    <p class="text-muted">Complete system overview and KPIs</p>
+                                    <a href="{{ url_for('reports.overview') }}" class="btn btn-dark">
+                                        <i class="fas fa-eye"></i>
+                                        View Report
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Summary -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-day"></i>
+                        Today's Performance
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <h4 class="text-primary">{{ stats.today_orders or 0 }}</h4>
+                            <small class="text-muted">Orders Today</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <h4 class="text-success">{{ "%.0f"|format(stats.today_revenue or 0) }}</h4>
+                            <small class="text-muted">Revenue Today</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <h5 class="text-info">{{ stats.today_new_customers or 0 }}</h5>
+                            <small class="text-muted">New Customers</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <h5 class="text-warning">{{ "%.1f"|format(stats.average_rating or 0) }}</h5>
+                            <small class="text-muted">Avg Rating</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i>
+                        This Week's Trends
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 text-center">
+                            <h4 class="text-primary">{{ stats.week_orders or 0 }}</h4>
+                            <small class="text-muted">Orders This Week</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <h4 class="text-success">{{ "%.0f"|format(stats.week_revenue or 0) }}</h4>
+                            <small class="text-muted">Revenue This Week</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            {% if stats.growth_rate is defined %}
+                                {% if stats.growth_rate > 0 %}
+                                    <h5 class="text-success">
+                                        <i class="fas fa-arrow-up"></i>
+                                        +{{ "%.1f"|format(stats.growth_rate) }}%
+                                    </h5>
+                                    <small class="text-muted">Growth vs Last Week</small>
+                                {% elif stats.growth_rate < 0 %}
+                                    <h5 class="text-danger">
+                                        <i class="fas fa-arrow-down"></i>
+                                        {{ "%.1f"|format(stats.growth_rate) }}%
+                                    </h5>
+                                    <small class="text-muted">Change vs Last Week</small>
+                                {% else %}
+                                    <h5 class="text-info">
+                                        <i class="fas fa-minus"></i>
+                                        0.0%
+                                    </h5>
+                                    <small class="text-muted">No Change</small>
+                                {% endif %}
+                            {% else %}
+                                <h5 class="text-muted">N/A</h5>
+                                <small class="text-muted">Insufficient Data</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-outline-primary w-100" onclick="generateDailyReport()">
+                                <i class="fas fa-file-alt"></i>
+                                Daily Report
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-outline-success w-100" onclick="generateWeeklyReport()">
+                                <i class="fas fa-calendar-week"></i>
+                                Weekly Report
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <button class="btn btn-outline-warning w-100" onclick="generateMonthlyReport()">
+                                <i class="fas fa-calendar-alt"></i>
+                                Monthly Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshReports() {
+    window.location.reload();
+}
+
+function generateDailyReport() {
+    const today = new Date().toISOString().split('T')[0];
+    window.open(`/reports/daily/${today}`, '_blank');
+}
+
+function generateWeeklyReport() {
+    const today = new Date();
+    const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+    const weekStartStr = weekStart.toISOString().split('T')[0];
+    window.open(`/reports/weekly/${weekStartStr}`, '_blank');
+}
+
+function generateMonthlyReport() {
+    const today = new Date();
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthStartStr = monthStart.toISOString().split('T')[0];
+    window.open(`/reports/monthly/${monthStartStr}`, '_blank');
+}
+</script>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid #dee2e6;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.border-primary { border-color: #007bff !important; }
+.border-success { border-color: #28a745 !important; }
+.border-warning { border-color: #ffc107 !important; }
+.border-info { border-color: #17a2b8 !important; }
+.border-secondary { border-color: #6c757d !important; }
+.border-dark { border-color: #343a40 !important; }
+
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-warning:hover,
+.btn-outline-info:hover,
+.btn-outline-secondary:hover {
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+</style>
+{% endblock %}

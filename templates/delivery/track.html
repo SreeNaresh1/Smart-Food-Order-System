@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+
+{% block title %}Track Delivery - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-truck"></i> Track Your Delivery</h1>
+                <a href="{{ url_for('orders.list_orders') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-list"></i> All Orders
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    {% if order %}
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Order Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Order #{{ order.order_id }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Order Date:</strong> {{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total_amount) }}</p>
+                            <p><strong>Payment Status:</strong> 
+                                <span class="badge bg-{{ 'success' if order.payment else 'warning' }}">
+                                    {{ 'Paid' if order.payment else 'Pending' }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Delivery Address:</strong></p>
+                            <address class="text-muted">{{ order.delivery_address }}</address>
+                            {% if delivery %}
+                            <p><strong>Contact:</strong> {{ delivery.delivery_person_name or 'Not assigned' }}</p>
+                            <p><strong>Phone:</strong> {{ delivery.delivery_person_phone or 'N/A' }}</p>
+                            {% else %}
+                            <p><strong>Contact:</strong> Will be assigned soon</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Items -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Items</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detail in order.order_details %}
+                                <tr>
+                                    <td>{{ detail.menu_item.name }}</td>
+                                    <td>{{ detail.quantity }}</td>
+                                    <td>₹{{ "%.2f"|format(detail.unit_price) }}</td>
+                                    <td>₹{{ "%.2f"|format(detail.sub_total) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td colspan="3">Total</td>
+                                    <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Delivery Status Timeline -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Delivery Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item {{ 'completed' if order.status in ['confirmed', 'preparing', 'ready', 'delivered'] else 'current' if order.status == 'pending' else 'pending' }}">
+                            <div class="timeline-marker">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Order Placed</h6>
+                                <p class="text-muted small">Your order has been received and payment confirmed.</p>
+                                <small class="text-muted">{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {{ 'completed' if order.status in ['preparing', 'ready', 'delivered'] else 'current' if order.status == 'confirmed' else 'pending' }}">
+                            <div class="timeline-marker">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Order Confirmed</h6>
+                                <p class="text-muted small">Your order has been confirmed and sent to kitchen.</p>
+                                {% if order.status in ['confirmed', 'preparing', 'ready', 'delivered'] %}
+                                <small class="text-muted">Confirmed</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {{ 'completed' if order.status in ['ready', 'delivered'] else 'current' if order.status == 'preparing' else 'pending' }}">
+                            <div class="timeline-marker">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Preparing</h6>
+                                <p class="text-muted small">Our kitchen staff is preparing your delicious meal.</p>
+                                {% if order.status == 'preparing' %}
+                                <small class="text-muted">In progress</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {{ 'completed' if order.status == 'delivered' else 'current' if order.status == 'ready' else 'pending' }}">
+                            <div class="timeline-marker">
+                                <i class="fas fa-motorcycle"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Out for Delivery</h6>
+                                <p class="text-muted small">Your order is on the way to your address!</p>
+                                {% if order.status == 'ready' %}
+                                <small class="text-muted">Just dispatched</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {{ 'completed' if order.status == 'delivered' else 'pending' }}">
+                            <div class="timeline-marker">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6>Delivered</h6>
+                                <p class="text-muted small">Order delivered successfully. Enjoy your meal!</p>
+                                {% if order.status == 'delivered' %}
+                                <small class="text-muted">Delivered</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Delivery Status Card -->
+            <div class="card mb-4">
+                <div class="card-header text-center">
+                    <h5 class="mb-0">Delivery Status</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% set status_info = {
+                        'pending': {'icon': 'fas fa-clock', 'color': 'warning', 'text': 'Order Placed'},
+                        'confirmed': {'icon': 'fas fa-utensils', 'color': 'info', 'text': 'Order Confirmed'},
+                        'preparing': {'icon': 'fas fa-fire', 'color': 'primary', 'text': 'Being Prepared'},
+                        'ready': {'icon': 'fas fa-shipping-fast', 'color': 'dark', 'text': 'Out for Delivery'},
+                        'delivered': {'icon': 'fas fa-check-circle', 'color': 'success', 'text': 'Delivered'}
+                    } %}
+                    
+                    {% set current_status = status_info.get(order.status, status_info['pending']) %}
+                    
+                    <div class="status-icon mb-3">
+                        <i class="{{ current_status.icon }} fa-3x text-{{ current_status.color }}"></i>
+                    </div>
+                    <h4 class="text-{{ current_status.color }}">{{ current_status.text }}</h4>
+                    
+                    {% if order.status == 'delivered' %}
+                        <p class="text-muted">Order delivered successfully!</p>
+                    {% elif order.status == 'ready' %}
+                        <p class="text-muted">Expected delivery in 15-30 minutes</p>
+                    {% elif order.status == 'preparing' %}
+                        <p class="text-muted">Estimated preparation time: 20-25 minutes</p>
+                    {% elif order.status == 'confirmed' %}
+                        <p class="text-muted">Order confirmed, starting preparation</p>
+                    {% else %}
+                        <p class="text-muted">Your order is being processed</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Estimated Time Card -->
+            {% if order.status != 'delivered' %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Estimated Delivery Time</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="estimated-time">
+                        {% if order.estimated_time %}
+                        <h3 class="text-primary">{{ order.estimated_time.strftime('%H:%M') }}</h3>
+                        <p class="text-muted">{{ order.estimated_time.strftime('%B %d, %Y') }}</p>
+                        {% else %}
+                        <h3 class="text-primary">30-45 min</h3>
+                        <p class="text-muted">Estimated delivery window</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Contact Delivery Person -->
+            {% if delivery and delivery.delivery_person_phone and order.status == 'ready' %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Contact Delivery Partner</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="delivery-avatar me-3">
+                            <i class="fas fa-user-circle fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{ delivery.delivery_person_name }}</h6>
+                            <small class="text-muted">Delivery Partner</small>
+                        </div>
+                    </div>
+                    <a href="tel:{{ delivery.delivery_person_phone }}" class="btn btn-primary w-100">
+                        <i class="fas fa-phone"></i> Call Delivery Partner
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('orders.list_orders') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-list"></i> View All Orders
+                        </a>
+                        {% if order.status == 'delivered' %}
+                        <a href="{{ url_for('feedback.add_feedback_for_order', order_id=order.order_id) }}" class="btn btn-success">
+                            <i class="fas fa-star"></i> Rate & Review
+                        </a>
+                        <a href="{{ url_for('menu.list_menu') }}" class="btn btn-primary">
+                            <i class="fas fa-redo"></i> Order Again
+                        </a>
+                        {% else %}
+                        <button class="btn btn-outline-secondary" onclick="refreshStatus()">
+                            <i class="fas fa-sync"></i> Refresh Status
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>Delivery Not Found</h4>
+                    <p class="text-muted">The requested delivery information could not be found.</p>
+                    <a href="{{ url_for('orders.list_orders') }}" class="btn btn-primary">
+                        <i class="fas fa-list"></i> View All Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.timeline {
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 60px;
+    margin-bottom: 30px;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 40px;
+    height: calc(100% + 10px);
+    width: 2px;
+    background-color: #dee2e6;
+}
+
+.timeline-item.completed::before {
+    background-color: #28a745;
+}
+
+.timeline-item.current::before {
+    background-color: #007bff;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.timeline-item.completed .timeline-marker {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.timeline-item.current .timeline-marker {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    }
+}
+
+.timeline-content {
+    padding: 10px 0;
+}
+
+.status-icon {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.delivery-avatar {
+    text-align: center;
+}
+
+.estimated-time h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function refreshStatus() {
+    // Reload the page to get updated status
+    window.location.reload();
+}
+
+// Auto-refresh every 30 seconds if not delivered
+{% if order and order.status != 'delivered' %}
+setTimeout(function() {
+    window.location.reload();
+}, 30000);
+{% endif %}
+</script>
+{% endblock %}

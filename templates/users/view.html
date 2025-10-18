@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}View User - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-user text-primary"></i>
+                            User Details
+                        </h3>
+                        <div>
+                            <a href="{{ url_for('users.edit_user', user_id=user.user_id) }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{{ url_for('users.list_users') }}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- User Information -->
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-info-circle text-info"></i> Personal Information
+                            </h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold" style="width: 40%;">User ID:</td>
+                                    <td>#{{ user.user_id }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Full Name:</td>
+                                    <td>{{ user.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Email:</td>
+                                    <td>
+                                        <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Phone:</td>
+                                    <td>
+                                        {% if user.phone %}
+                                            <a href="tel:{{ user.phone }}">{{ user.phone }}</a>
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Role:</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if user.role == 'Admin' %}bg-danger
+                                            {% elif user.role == 'Supervisor' %}bg-warning
+                                            {% elif user.role == 'Employee' %}bg-info
+                                            {% else %}bg-primary
+                                            {% endif %}">
+                                            {{ user.role }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Address:</td>
+                                    <td>
+                                        {% if user.address %}
+                                            {{ user.address }}
+                                        {% else %}
+                                            <span class="text-muted">Not provided</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Member Since:</td>
+                                    <td>
+                                        {% if user.created_date %}
+                                            {{ user.created_date.strftime('%B %d, %Y') }}
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- User Statistics -->
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-chart-bar text-success"></i> Statistics
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="card bg-primary text-white">
+                                        <div class="card-body text-center">
+                                            <h3 class="mb-0">{{ user_stats.total_orders }}</h3>
+                                            <small>Total Orders</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="card bg-success text-white">
+                                        <div class="card-body text-center">
+                                            <h3 class="mb-0">{{ user_stats.total_feedback }}</h3>
+                                            <small>Feedback Given</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if user_stats.recent_orders %}
+                            <h6 class="mt-4 mb-3">
+                                <i class="fas fa-history"></i> Recent Orders
+                            </h6>
+                            <div class="list-group">
+                                {% for order in user_stats.recent_orders %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>Order #{{ order.order_id }}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                {{ order.order_date.strftime('%b %d, %Y %I:%M %p') if order.order_date else 'N/A' }}
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge 
+                                                {% if order.status == 'Delivered' %}bg-success
+                                                {% elif order.status == 'Cancelled' %}bg-danger
+                                                {% elif order.status == 'Preparing' %}bg-warning
+                                                {% else %}bg-info
+                                                {% endif %}">
+                                                {{ order.status|capitalize }}
+                                            </span>
+                                            <br>
+                                            <strong class="text-primary">{{ "%.2f"|format(order.total_amount|float) }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info mt-4">
+                                <i class="fas fa-info-circle"></i> No orders found for this user.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <form method="POST" action="{{ url_for('users.delete_user', user_id=user.user_id) }}" 
+                              onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Delete User
+                            </button>
+                        </form>
+                        <a href="{{ url_for('users.edit_user', user_id=user.user_id) }}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit User
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid #dee2e6;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table-borderless td {
+    padding: 0.5rem 0;
+}
+
+.list-group-item {
+    border: 1px solid #dee2e6;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.card.bg-primary, .card.bg-success {
+    border: none;
+}
+
+.card.bg-primary .card-body, .card.bg-success .card-body {
+    padding: 1rem;
+}
+</style>
+{% endblock %}
+

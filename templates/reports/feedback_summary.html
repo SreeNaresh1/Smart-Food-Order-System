@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback Summary - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-comments text-info"></i>
+            Feedback Summary Report
+        </h2>
+        <div>
+            <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Reports
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                Print Report
+            </button>
+        </div>
+    </div>
+
+    <div class="alert alert-primary">
+        <i class="fas fa-star"></i>
+        <strong>Feedback Summary</strong> - Customer reviews, ratings, and satisfaction metrics.
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Total Feedback</h6>
+                    <h3>{{ total_feedback }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Average Rating</h6>
+                    <h3>{{ avg_rating }} <i class="fas fa-star"></i></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Rating Distribution -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-star"></i> Rating Distribution</h5>
+                </div>
+                <div class="card-body">
+                    {% if rating_distribution %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rating</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for rating, count in rating_distribution.items() %}
+                                <tr>
+                                    <td>
+                                        {% for i in range(rating) %}
+                                        <i class="fas fa-star text-warning"></i>
+                                        {% endfor %}
+                                        ({{ rating }})
+                                    </td>
+                                    <td><span class="badge bg-primary">{{ count }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No rating data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback by Type -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-layer-group"></i> Feedback by Type</h5>
+                </div>
+                <div class="card-body">
+                    {% if type_distribution %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Count</th>
+                                    <th>Avg Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for type_data in type_distribution %}
+                                <tr>
+                                    <td><span class="badge bg-info">{{ type_data[0] }}</span></td>
+                                    <td>{{ type_data[1] }}</td>
+                                    <td>
+                                        <strong>{{ "%.2f"|format(type_data[2]) }}</strong>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No type data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Trends -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-line"></i> Monthly Feedback Trends</h5>
+        </div>
+        <div class="card-body">
+            {% if monthly_trends %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Feedback Count</th>
+                            <th>Average Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trend in monthly_trends %}
+                        <tr>
+                            <td>{{ trend.month }}</td>
+                            <td><span class="badge bg-primary">{{ trend.feedback_count }}</span></td>
+                            <td>
+                                <strong>{{ "%.2f"|format(trend.avg_rating) }}</strong>
+                                <i class="fas fa-star text-warning"></i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center">No monthly trend data available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Low Ratings (Need Attention) -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Low Ratings (Need Attention)</h5>
+                </div>
+                <div class="card-body">
+                    {% if low_ratings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Rating</th>
+                                    <th>Type</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feedback, user, order in low_ratings %}
+                                <tr>
+                                    <td>{{ feedback.feedback_date.strftime('%Y-%m-%d') if feedback.feedback_date else 'N/A' }}</td>
+                                    <td>{{ user.name if user else 'N/A' }}</td>
+                                    <td>
+                                        {% for i in range(feedback.rating) %}
+                                        <i class="fas fa-star text-warning"></i>
+                                        {% endfor %}
+                                    </td>
+                                    <td><span class="badge bg-secondary">{{ feedback.feedback_type }}</span></td>
+                                    <td><small>{{ feedback.comments[:50] if feedback.comments else 'No comments' }}...</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No low ratings found!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- High Ratings (Best Feedback) -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-thumbs-up"></i> Best Feedback (5 Stars)</h5>
+                </div>
+                <div class="card-body">
+                    {% if high_ratings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Type</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feedback, user in high_ratings %}
+                                <tr>
+                                    <td>{{ feedback.feedback_date.strftime('%Y-%m-%d') if feedback.feedback_date else 'N/A' }}</td>
+                                    <td>{{ user.name if user else 'N/A' }}</td>
+                                    <td><span class="badge bg-success">{{ feedback.feedback_type }}</span></td>
+                                    <td><small>{{ feedback.comments[:50] if feedback.comments else 'No comments' }}...</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No 5-star ratings yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

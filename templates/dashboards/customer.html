@@ -1,0 +1,1703 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Smart Food Ordering System{% endblock %}
+
+{% block head %}
+<!-- Force CSS reload -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script>
+    // Force body background on load with rainbow gradient and bubbles
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply balanced rainbow gradient background with more color variety
+        document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #4facfe 15%, #00f2fe 30%, #43e97b 45%, #38f9d7 60%, #ffd93d 75%, #fa709a 90%, #667eea 100%)';
+        document.body.style.backgroundSize = '400% 400%';
+        document.body.style.animation = 'gradientFlow 25s ease infinite';
+        document.body.style.backgroundAttachment = 'fixed';
+        document.body.style.minHeight = '100vh';
+        document.body.style.position = 'relative';
+        document.body.style.overflow = 'auto';
+        
+        // Make main transparent
+        const main = document.querySelector('main');
+        if (main) {
+            main.style.background = 'transparent';
+        }
+        
+        // Update navbar to match rainbow theme
+        const navbar = document.querySelector('nav.navbar');
+        if (navbar) {
+            navbar.style.background = 'linear-gradient(90deg, #667eea 0%, #4facfe 25%, #00f2fe 50%, #43e97b 75%, #667eea 100%)';
+            navbar.style.backgroundSize = '200% 100%';
+            navbar.style.animation = 'navbarFlow 15s ease infinite';
+            navbar.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+            
+            // Make all navbar text white and bold for visibility
+            const navLinks = navbar.querySelectorAll('.nav-link, .navbar-brand, .navbar-text, .dropdown-toggle');
+            navLinks.forEach(link => {
+                link.style.color = 'white';
+                link.style.fontWeight = '600';
+                link.style.textShadow = '1px 1px 3px rgba(0, 0, 0, 0.3)';
+            });
+            
+            // Style dropdown menus
+            const dropdowns = navbar.querySelectorAll('.dropdown-item');
+            dropdowns.forEach(item => {
+                item.style.color = '#333';
+            });
+        }
+        
+        // Create animated bubbles
+        const bubbleContainer = document.createElement('div');
+        bubbleContainer.style.position = 'fixed';
+        bubbleContainer.style.top = '0';
+        bubbleContainer.style.left = '0';
+        bubbleContainer.style.width = '100%';
+        bubbleContainer.style.height = '100%';
+        bubbleContainer.style.pointerEvents = 'none';
+        bubbleContainer.style.zIndex = '0';
+        bubbleContainer.style.overflow = 'hidden';
+        
+        // Create multiple bubbles with different sizes and positions (increased to 50 bubbles)
+        for (let i = 0; i < 50; i++) {
+            const bubble = document.createElement('div');
+            const size = Math.random() * 120 + 30; // Varied sizes from 30px to 150px
+            const left = Math.random() * 100;
+            const delay = Math.random() * 15; // Longer delays for more variation
+            const duration = Math.random() * 15 + 10; // Varied speeds (10-25 seconds)
+            
+            bubble.style.position = 'absolute';
+            bubble.style.bottom = '-150px';
+            bubble.style.left = left + '%';
+            bubble.style.width = size + 'px';
+            bubble.style.height = size + 'px';
+            bubble.style.background = 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.05))';
+            bubble.style.borderRadius = '50%';
+            bubble.style.animation = `floatUp ${duration}s ${delay}s infinite ease-in`;
+            bubble.style.opacity = '0.6';
+            bubble.style.backdropFilter = 'blur(3px)';
+            bubble.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+            
+            bubbleContainer.appendChild(bubble);
+        }
+        
+        document.body.insertBefore(bubbleContainer, document.body.firstChild);
+    });
+</script>
+<style>
+    @keyframes floatUp {
+        0% {
+            transform: translateY(0) translateX(0) scale(1);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.5;
+        }
+        90% {
+            opacity: 0.5;
+        }
+        100% {
+            transform: translateY(-120vh) translateX(100px) scale(1.2);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes navbarFlow {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Modern Vibrant Background - Matching Admin Dashboard */
+    body {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 25%, #667eea 50%, #764ba2 75%, #f093fb 100%) !important;
+        background-size: 400% 400% !important;
+        animation: gradientFlow 20s ease infinite !important;
+        min-height: 100vh;
+        background-attachment: fixed !important;
+    }
+
+    /* Ensure main container is transparent */
+    main {
+        background: transparent !important;
+    }
+
+    /* Make navbar slightly transparent to show gradient */
+    nav.navbar {
+        background: rgba(13, 110, 253, 0.95) !important;
+        backdrop-filter: blur(10px);
+    }
+
+    @keyframes gradientFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Floating Food Icons */
+    .food-icon-float {
+        position: fixed;
+        font-size: 2rem;
+        opacity: 0.15;
+        animation: floatFood 20s infinite ease-in-out;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    @keyframes floatFood {
+        0%, 100% {
+            transform: translateY(0) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-50px) rotate(180deg);
+        }
+    }
+
+    /* Particle Stars */
+    .particle-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: radial-gradient(circle, #fff 0%, transparent 70%);
+        border-radius: 50%;
+        opacity: 0.6;
+        animation: twinkle 3s infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.5); }
+    }
+
+    /* Main Container - Transparent to show body gradient */
+    .container-fluid {
+        position: relative;
+        z-index: 1;
+        padding-top: 10px;
+        padding-bottom: 50px;
+        background: transparent !important;
+    }
+
+    /* Core Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-60px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(60px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    @keyframes rotate360 {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+
+    /* Welcome Banner - Ultra Vibrant Box Style (Matching Admin Dashboard) */
+    .welcome-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+        background-size: 200% 200%;
+        animation: gradientFlow 8s ease infinite;
+        border-radius: 25px;
+        padding: 2rem 2.5rem;
+        color: white !important;
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        position: relative;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 1.5rem;
+        display: block !important;
+    }
+
+    .welcome-banner * {
+        color: white !important;
+    }
+
+    .welcome-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+        animation: shimmer 4s infinite;
+        z-index: 0;
+    }
+
+    .welcome-banner h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-banner small {
+        font-size: 1rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-banner .d-flex {
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-icon {
+        display: inline-block;
+        animation: bounce 2s infinite, rotate360 4s infinite;
+        font-size: 2rem;
+    }
+
+    .live-clock {
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        background: rgba(255, 255, 255, 0.15);
+        padding: 0.4rem 0.8rem;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Stat Cards - Admin Dashboard Style */
+    .stat-card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-15px) scale(1.03);
+        box-shadow: 0 25px 60px rgba(0,0,0,0.25) !important;
+        filter: brightness(1.05);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        pointer-events: none;
+    }
+
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        animation: shimmer 4s infinite;
+        pointer-events: none;
+    }
+
+    .stat-card.card-1:hover { 
+        box-shadow: 0 0 40px rgba(102, 126, 234, 0.8), 0 20px 60px rgba(0,0,0,0.3) !important; 
+    }
+
+    .stat-card.card-2:hover { 
+        box-shadow: 0 0 40px rgba(254, 225, 64, 0.8), 0 20px 60px rgba(0,0,0,0.3) !important; 
+    }
+
+    .stat-card.card-3:hover { 
+        box-shadow: 0 0 40px rgba(56, 239, 125, 0.8), 0 20px 60px rgba(0,0,0,0.3) !important; 
+    }
+
+    .stat-card.card-4:hover { 
+        box-shadow: 0 0 40px rgba(79, 172, 254, 0.8), 0 20px 60px rgba(0,0,0,0.3) !important; 
+    }
+
+    /* Quick Action Cards - SUPER VIBRANT */
+    .action-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        animation: fadeInUp 0.8s ease;
+        transform-style: preserve-3d;
+    }
+
+    .action-card:hover {
+        transform: translateY(-15px) scale(1.05) rotateX(5deg);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3),
+                    0 0 30px currentColor;
+    }
+
+    .action-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    .action-card:hover::before {
+        opacity: 1;
+        animation: shimmer 1.5s infinite;
+    }
+
+    .action-card.browse-menu {
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 50%, #FFA94D 100%);
+        animation-delay: 0.1s;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+    }
+
+    .action-card.browse-menu:hover {
+        box-shadow: 0 25px 50px rgba(255, 107, 107, 0.6),
+                    0 0 40px rgba(255, 142, 83, 0.8);
+    }
+
+    .action-card.view-cart {
+        background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 50%, #64E3FF 100%);
+        animation-delay: 0.2s;
+        box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+    }
+
+    .action-card.view-cart:hover {
+        box-shadow: 0 25px 50px rgba(79, 172, 254, 0.6),
+                    0 0 40px rgba(0, 242, 254, 0.8);
+    }
+
+    .action-card.track-orders {
+        background: linear-gradient(135deg, #FFE66D 0%, #FF6B9D 50%, #C44569 100%);
+        animation-delay: 0.3s;
+        box-shadow: 0 10px 30px rgba(255, 230, 109, 0.4);
+    }
+
+    .action-card.track-orders:hover {
+        box-shadow: 0 25px 50px rgba(255, 230, 109, 0.6),
+                    0 0 40px rgba(255, 107, 157, 0.8);
+    }
+
+    .action-card.order-history {
+        background: linear-gradient(135deg, #A8EDEA 0%, #FED6E3 50%, #FFB6C1 100%);
+        animation-delay: 0.4s;
+        box-shadow: 0 10px 30px rgba(168, 237, 234, 0.4);
+    }
+
+    .action-card.order-history:hover {
+        box-shadow: 0 25px 50px rgba(168, 237, 234, 0.6),
+                    0 0 40px rgba(254, 214, 227, 0.8);
+    }
+
+    .action-card-icon {
+        font-size: 3rem;
+        opacity: 0.95;
+        transition: all 0.4s;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-card:hover .action-card-icon {
+        transform: scale(1.3) rotate(15deg);
+        opacity: 1;
+        animation: pulse 1s infinite, rotate360 2s infinite;
+    }
+
+    .action-card .btn {
+        transition: all 0.4s;
+        border: 3px solid rgba(255, 255, 255, 1);
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 0.6rem 1.5rem;
+        border-radius: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .action-card .btn:hover {
+        transform: scale(1.15);
+        background: white;
+        border-color: white;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        color: #333 !important;
+    }
+
+    /* Glass Card Effect - More Vibrant */
+    .glass-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+        backdrop-filter: blur(15px);
+        border-radius: 25px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2),
+                    inset 0 -3px 10px rgba(255, 255, 255, 0.5);
+        animation: fadeInUp 1s ease;
+    }
+
+    .glass-card-header {
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 50%, #FFA94D 100%);
+        color: white;
+        border: none;
+        border-radius: 25px 25px 0 0;
+        padding: 1.5rem 2rem;
+        font-weight: 700;
+        font-size: 1.3rem;
+        box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .glass-card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    /* Recent Orders Section - Vibrant */
+    .order-item {
+        padding: 1.5rem;
+        border-bottom: 2px solid rgba(255, 107, 107, 0.1);
+        transition: all 0.4s;
+        position: relative;
+        background: linear-gradient(90deg, transparent 0%, rgba(255, 107, 107, 0.05) 100%);
+    }
+
+    .order-item:hover {
+        background: linear-gradient(90deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 142, 83, 0.15) 100%);
+        transform: translateX(15px) scale(1.02);
+        box-shadow: -5px 0 20px rgba(255, 107, 107, 0.2);
+    }
+
+    .order-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 5px;
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+
+    .order-item:hover::before {
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+    }
+
+    /* Stats Card - Ultra Vibrant */
+    .stats-card {
+        background: linear-gradient(135deg, #FF6B9D 0%, #C44569 50%, #9B2C4D 100%);
+        border-radius: 25px;
+        padding: 2rem;
+        color: white;
+        box-shadow: 0 15px 50px rgba(255, 107, 157, 0.5),
+                    inset 0 -5px 15px rgba(255, 255, 255, 0.2);
+        animation: slideInRight 1s ease, pulse 3s infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-card::before {
+        content: '📊';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 3rem;
+        opacity: 0.2;
+        animation: rotate360 10s linear infinite;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        display: inline-block;
+        animation: pulse 2s infinite;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3),
+                     0 0 20px rgba(255, 255, 255, 0.5);
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.95;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 600;
+    }
+
+    /* Favorites Card - Super Vibrant */
+    .favorites-card {
+        background: linear-gradient(135deg, #FFE66D 0%, #FFAB73 50%, #FF6B6B 100%);
+        border-radius: 25px;
+        color: white;
+        box-shadow: 0 15px 50px rgba(255, 230, 109, 0.5),
+                    inset 0 -5px 15px rgba(255, 255, 255, 0.2);
+        animation: slideInRight 1.2s ease, pulse 4s infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .favorites-card::before {
+        content: '❤️';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 3rem;
+        opacity: 0.2;
+        animation: pulse 2s infinite;
+    }
+
+    .favorite-item {
+        padding: 1.2rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.4s;
+        position: relative;
+    }
+
+    .favorite-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(10px) scale(1.03);
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .favorite-item:last-child {
+        border-bottom: none;
+    }
+
+    /* Profile Card - Eye-Catching */
+    .profile-card {
+        background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 50%, #43E97B 100%);
+        border-radius: 25px;
+        color: white;
+        box-shadow: 0 15px 50px rgba(79, 172, 254, 0.5),
+                    inset 0 -5px 15px rgba(255, 255, 255, 0.2);
+        animation: slideInRight 1.4s ease, pulse 5s infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-card::before {
+        content: '👤';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 3rem;
+        opacity: 0.2;
+        animation: bounce 3s infinite;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+                    inset 0 -3px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.5s;
+        border: 5px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.15) rotate(10deg);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4),
+                    0 0 30px rgba(255, 255, 255, 0.5);
+        animation: pulse 1s infinite;
+    }
+
+    .profile-avatar i {
+        font-size: 4rem;
+        color: #4FACFE;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Recommendations Section - Super Attractive */
+    .recommendation-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.5s;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        position: relative;
+    }
+
+    .recommendation-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    .recommendation-card:hover {
+        transform: translateY(-15px) rotate(3deg) scale(1.05);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3),
+                    0 0 40px rgba(102, 126, 234, 0.5);
+    }
+
+    .recommendation-card:hover::before {
+        opacity: 1;
+        animation: shimmer 2s infinite;
+    }
+
+    .recommendation-card .btn-primary {
+        background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+        border: none;
+        transition: all 0.4s;
+        position: relative;
+        overflow: hidden;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 0.7rem 1.5rem;
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    .recommendation-card .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .recommendation-card .btn-primary:hover {
+        transform: scale(1.1);
+        box-shadow: 0 10px 25px rgba(255, 107, 107, 0.6);
+    }
+
+    .recommendation-card .btn-primary:hover::before {
+        width: 400px;
+        height: 400px;
+    }
+
+    /* Quick Reorder Section - Bright & Fun */
+    .reorder-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 250, 240, 0.95) 100%);
+        border-radius: 20px;
+        border: 3px solid #FFE66D;
+        transition: all 0.4s;
+        box-shadow: 0 10px 25px rgba(255, 230, 109, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .reorder-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255, 230, 109, 0.1) 0%, rgba(255, 142, 83, 0.1) 100%);
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+
+    .reorder-card:hover {
+        border-color: #FF8E53;
+        box-shadow: 0 15px 40px rgba(255, 142, 83, 0.4);
+        transform: translateY(-10px) scale(1.03);
+    }
+
+    .reorder-card:hover::before {
+        opacity: 1;
+    }
+
+    /* Badges & Status - Vibrant */
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        display: inline-block;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        animation: pulse 2s infinite;
+    }
+
+    /* Empty State - Fun & Engaging */
+    .empty-state {
+        padding: 5rem 2rem;
+        text-align: center;
+        animation: fadeInUp 1s ease;
+    }
+
+    .empty-state i {
+        animation: bounce 2s infinite;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+    }
+
+    /* Button Ripple Effect - Enhanced */
+    .ripple-btn {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s;
+    }
+
+    .ripple-btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .ripple-btn:hover::after {
+        width: 400px;
+        height: 400px;
+    }
+
+    /* Section Headers - Eye-Catching */
+    .section-header {
+        background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 50%, #4FACFE 100%);
+        background-size: 300% 300%;
+        animation: gradientFlow 5s ease infinite;
+        color: white;
+        border-radius: 20px;
+        padding: 1.2rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        animation: slideInLeft 1s ease, pulse 6s infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .section-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    /* Loading Animation - Colorful */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        body {
+            background-size: 600% 600%;
+        }
+
+        .welcome-banner h1 {
+            font-size: 2rem;
+        }
+
+        .welcome-icon {
+            font-size: 2.5rem;
+        }
+
+        .action-card-icon {
+            font-size: 2.2rem;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+        }
+
+        .profile-avatar i {
+            font-size: 3rem;
+        }
+    }
+
+    /* Special Effects */
+    .glow-effect {
+        animation: glow 2s infinite;
+    }
+
+    @keyframes glow {
+        0%, 100% {
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+        50% {
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.8),
+                        0 0 60px rgba(255, 230, 109, 0.6);
+        }
+    }
+
+    /* Confetti Effect for celebrations */
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #FF6B6B;
+        animation: confettiFall 3s linear;
+    }
+
+    @keyframes confettiFall {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
+        border-radius: 10px;
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #FFE66D 0%, #FF6B6B 100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-4 py-2" style="background: transparent !important;">
+    <!-- Welcome Banner Box (Matching Admin Dashboard) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="welcome-banner" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important; padding: 2rem 2.5rem !important; border-radius: 25px !important; color: white !important; box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4) !important; margin-bottom: 1.5rem !important; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                <div class="d-flex justify-content-between align-items-center" style="position: relative; z-index: 2;">
+                    <div>
+                        <h1 class="mb-0" style="color: white !important; font-size: 2.5rem; font-weight: 800;"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
+                        <small style="color: white !important; font-size: 1rem;">Welcome back, {{ user.name.split()[0] }}! 👋</small>
+                    </div>
+                    <div>
+                        <p class="mb-0 live-clock" id="liveClock" style="color: white !important; background: rgba(255, 255, 255, 0.15); padding: 0.4rem 0.8rem; border-radius: 12px; font-size: 0.95rem; font-weight: 600;"><i class="fas fa-clock me-1"></i>{{ current_time }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards (Admin Dashboard Style) -->
+    <div class="row mb-3 g-3">
+        <!-- Total Orders Card -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card card-1 text-white shadow" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border: none; border-radius: 25px; height: 100%; overflow: hidden; position: relative; animation: fadeInUp 0.8s ease-out; box-shadow: 0 15px 40px rgba(250, 112, 154, 0.5);">
+                <div class="card-body" style="padding: 2rem; position: relative; z-index: 1;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);">Total Orders</div>
+                            <div style="font-size: 3rem; font-weight: 800; line-height: 1; margin: 0.5rem 0; color: white; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);">{{ stats.total_orders or 0 }}</div>
+                        </div>
+                        <div style="font-size: 4rem; opacity: 0.25; filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.3)); color: white;">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Orders Card -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card card-2 text-white shadow" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); border: none; border-radius: 25px; height: 100%; overflow: hidden; position: relative; animation: fadeInUp 0.8s ease-out 0.1s; animation-fill-mode: both; box-shadow: 0 15px 40px rgba(251, 194, 235, 0.5);">
+                <div class="card-body" style="padding: 2rem; position: relative; z-index: 1;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);">Pending Orders</div>
+                            <div style="font-size: 3rem; font-weight: 800; line-height: 1; margin: 0.5rem 0; color: white; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);">{{ stats.pending_orders or 0 }}</div>
+                        </div>
+                        <div style="font-size: 4rem; opacity: 0.25; filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.3)); color: white;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Spent Card -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card card-3 text-white shadow" style="background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%); border: none; border-radius: 25px; height: 100%; overflow: hidden; position: relative; animation: fadeInUp 0.8s ease-out 0.2s; animation-fill-mode: both; box-shadow: 0 15px 40px rgba(56, 239, 125, 0.5);">
+                <div class="card-body" style="padding: 2rem; position: relative; z-index: 1;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);">Total Spent</div>
+                            <div style="font-size: 2.5rem; font-weight: 800; line-height: 1; margin: 0.5rem 0; color: white; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);">₹{{ "%.0f"|format(stats.total_spent or 0) }}</div>
+                        </div>
+                        <div style="font-size: 4rem; opacity: 0.25; filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.3)); color: white;">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorite Items Card -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card card-4 text-white shadow" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border: none; border-radius: 25px; height: 100%; overflow: hidden; position: relative; animation: fadeInUp 0.8s ease-out 0.3s; animation-fill-mode: both; box-shadow: 0 15px 40px rgba(79, 172, 254, 0.5);">
+                <div class="card-body" style="padding: 2rem; position: relative; z-index: 1;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);">Favorite Items</div>
+                            <div style="font-size: 3rem; font-weight: 800; line-height: 1; margin: 0.5rem 0; color: white; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);">{{ stats.favorite_count or 0 }}</div>
+                        </div>
+                        <div style="font-size: 4rem; opacity: 0.25; filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.3)); color: white;">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="action-card browse-menu text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; border-radius: 20px !important; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4) !important; border: 2px solid rgba(255, 255, 255, 0.2); transition: transform 0.3s ease; cursor: pointer;">
+                <div class="card-body d-flex align-items-center p-4">
+                    <i class="fas fa-utensils action-card-icon me-3" style="font-size: 2.5rem; color: white !important;"></i>
+                    <div>
+                        <h6 class="card-title mb-2 fw-bold" style="color: white !important;">Browse Menu</h6>
+                        <a href="{{ url_for('menu.list_menu') }}" class="btn btn-light btn-sm ripple-btn" style="font-weight: 600;">
+                            <i class="fas fa-arrow-right me-1"></i> Order Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="action-card view-cart text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; border-radius: 20px !important; box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4) !important; border: 2px solid rgba(255, 255, 255, 0.2); transition: transform 0.3s ease; cursor: pointer;">
+                <div class="card-body d-flex align-items-center p-4">
+                    <i class="fas fa-shopping-cart action-card-icon me-3" style="font-size: 2.5rem; color: white !important;"></i>
+                    <div>
+                        <h6 class="card-title mb-2 fw-bold" style="color: white !important;">View Cart</h6>
+                        <a href="{{ url_for('orders.view_cart') }}" class="btn btn-light btn-sm ripple-btn" style="font-weight: 600;">
+                            <i class="fas fa-arrow-right me-1"></i> Check Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="action-card track-orders text-white" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important; border-radius: 20px !important; box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4) !important; border: 2px solid rgba(255, 255, 255, 0.2); transition: transform 0.3s ease; cursor: pointer;">
+                <div class="card-body d-flex align-items-center p-4">
+                    <i class="fas fa-truck action-card-icon me-3" style="font-size: 2.5rem; color: white !important;"></i>
+                    <div>
+                        <h6 class="card-title mb-2 fw-bold" style="color: white !important;">Track Orders</h6>
+                        <a href="{{ url_for('delivery.track') }}" class="btn btn-light btn-sm ripple-btn" style="font-weight: 600;">
+                            <i class="fas fa-arrow-right me-1"></i> Track Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="action-card order-history text-white" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important; border-radius: 20px !important; box-shadow: 0 10px 30px rgba(250, 112, 154, 0.4) !important; border: 2px solid rgba(255, 255, 255, 0.2); transition: transform 0.3s ease; cursor: pointer;">
+                <div class="card-body d-flex align-items-center p-4">
+                    <i class="fas fa-history action-card-icon me-3" style="font-size: 2.5rem; color: white !important;"></i>
+                    <div>
+                        <h6 class="card-title mb-2 fw-bold" style="color: white !important;">Order History</h6>
+                        <a href="{{ url_for('orders.list_orders') }}" class="btn btn-light btn-sm ripple-btn" style="font-weight: 600;">
+                            <i class="fas fa-arrow-right me-1"></i> View All
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Orders -->
+        <div class="col-lg-8 mb-4">
+            <div class="glass-card h-100" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important; border-radius: 25px !important; padding: 2rem !important; color: white !important; box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4) !important; border: 2px solid rgba(255, 255, 255, 0.2);">
+                <div class="glass-card-header d-flex justify-content-between align-items-center" style="border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important; padding-bottom: 1rem !important; margin-bottom: 1.5rem !important;">
+                    <h5 class="mb-0" style="color: white !important; font-weight: 800;"><i class="fas fa-clock me-2"></i> Recent Orders</h5>
+                    <a href="{{ url_for('orders.list_orders') }}" class="btn btn-light btn-sm ripple-btn">
+                        <i class="fas fa-arrow-right me-1"></i> View All Orders
+                    </a>
+                </div>
+                <div class="card-body p-0" style="color: white !important;">
+                    {% if stats.recent_orders %}
+                    <div class="list-group list-group-flush">
+                        {% for order in stats.recent_orders %}
+                        <div class="order-item d-flex justify-content-between align-items-center" style="background: rgba(255, 255, 255, 0.15) !important; border-radius: 15px !important; padding: 1.5rem !important; margin-bottom: 1rem !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2) !important;">
+                            <div>
+                                <h6 class="mb-2 fw-bold" style="color: white !important;">Order #{{ order.order_id }}</h6>
+                                <p class="mb-2 small" style="color: rgba(255, 255, 255, 0.9) !important;">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ order.order_date.strftime('%B %d, %Y at %I:%M %p') }}
+                                </p>
+                                <span class="status-badge bg-{{ 'success' if order.status == 'Delivered' else 'warning' if order.status == 'Pending' else 'info' }}" style="padding: 0.3rem 0.8rem; border-radius: 10px; font-size: 0.85rem;">
+                                    {{ order.status.title() }}
+                                </span>
+                            </div>
+                            <div class="text-end">
+                                <h5 class="mb-2 fw-bold" style="color: white !important;">₹{{ "%.2f"|format(order.total_amount) }}</h5>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('orders.view_order', order_id=order.order_id) }}" 
+                                       class="btn btn-outline-primary ripple-btn" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if order.status in ['Confirmed', 'Preparing', 'Ready'] %}
+                                    <a href="{{ url_for('delivery.track_delivery', order_id=order.order_id) }}" 
+                                       class="btn btn-outline-warning ripple-btn" title="Track Delivery">
+                                        <i class="fas fa-truck"></i>
+                                    </a>
+                                    {% elif order.status == 'Delivered' %}
+                                    <a href="{{ url_for('feedback.add_feedback_for_order', order_id=order.order_id) }}" 
+                                       class="btn btn-outline-success ripple-btn" title="Rate Order">
+                                        <i class="fas fa-star"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No orders yet</h5>
+                        <p class="text-muted mb-3">Ready to place your first order?</p>
+                        <a href="{{ url_for('menu.list_menu') }}" class="btn btn-primary btn-lg ripple-btn">
+                            <i class="fas fa-utensils me-2"></i> Browse Menu
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile & Stats -->
+        <div class="col-lg-4">
+            <!-- Quick Stats -->
+            <div class="stats-card mb-4" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important; border-radius: 25px !important; padding: 2rem !important; color: white !important; box-shadow: 0 15px 40px rgba(79, 172, 254, 0.4) !important; border: 2px solid rgba(255, 255, 255, 0.2);">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-chart-pie fa-2x me-3" style="color: white !important;"></i>
+                    <h5 class="mb-0 fw-bold" style="color: white !important;">My Stats</h5>
+                </div>
+                <div class="row text-center">
+                    <div class="col-6 border-end border-white border-opacity-25">
+                        <h2 class="stat-number mb-0" data-target="{{ stats.total_orders or 0 }}" style="color: white !important;">{{ stats.total_orders or 0 }}</h2>
+                        <small class="stat-label" style="color: rgba(255, 255, 255, 0.9) !important;">Total Orders</small>
+                    </div>
+                    <div class="col-6">
+                        <h2 class="stat-number mb-0" data-target="{{ stats.total_spent or 0 }}" style="color: white !important;">₹{{ stats.total_spent or 0 }}</h2>
+                        <small class="stat-label" style="color: rgba(255, 255, 255, 0.9) !important;">Total Spent</small>
+                    </div>
+                </div>
+                <hr class="border-white border-opacity-25 my-3">
+                <div class="text-center">
+                    <a href="{{ url_for('orders.list_orders') }}" class="btn btn-light btn-sm w-100 ripple-btn">
+                        <i class="fas fa-history me-2"></i> Order History
+                    </a>
+                </div>
+            </div>
+
+            <!-- Favorite Items -->
+            {% if stats.favorite_items %}
+            <div class="favorites-card mb-4" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important; border-radius: 25px !important; padding: 2rem !important; color: white !important; box-shadow: 0 15px 40px rgba(250, 112, 154, 0.4) !important; border: 2px solid rgba(255, 255, 255, 0.2);">
+                <div class="card-body" style="padding: 0 !important;">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-heart fa-2x me-3" style="color: white !important;"></i>
+                        <h5 class="mb-0 fw-bold" style="color: white !important;">Your Favorites</h5>
+                    </div>
+                    <div class="favorite-items-list">
+                        {% for item, count in stats.favorite_items %}
+                        <div class="favorite-item" style="background: rgba(255, 255, 255, 0.15) !important; border-radius: 15px !important; padding: 1rem !important; margin-bottom: 0.8rem !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2) !important;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 fw-bold" style="color: white !important;">{{ item.name }}</h6>
+                                    <small style="color: rgba(255, 255, 255, 0.9) !important;">
+                                        <i class="fas fa-redo me-1"></i>
+                                        Ordered {{ count }} times
+                                    </small>
+                                </div>
+                                <div>
+                                    <span class="badge bg-white px-3 py-2 fw-bold" style="color: #fa709a !important;">
+                                        ₹{{ "%.0f"|format(item.price) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Profile Card -->
+            <div class="profile-card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important; border-radius: 25px !important; padding: 2rem !important; color: white !important; box-shadow: 0 15px 40px rgba(255, 154, 158, 0.4) !important; border: 2px solid rgba(255, 255, 255, 0.2);">
+                <div class="card-body" style="padding: 0 !important;">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-user fa-2x me-3" style="color: white !important;"></i>
+                        <h5 class="mb-0 fw-bold" style="color: white !important;">My Profile</h5>
+                    </div>
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar" style="color: white !important;">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h5 class="mb-1 fw-bold" style="color: white !important;">{{ user.name }}</h5>
+                        <small style="color: rgba(255, 255, 255, 0.9) !important;">
+                            <i class="fas fa-calendar me-1"></i>
+                            Customer since {{ user.created_date.strftime('%B %Y') }}
+                        </small>
+                    </div>
+                    <hr class="border-white border-opacity-25">
+                    <div class="profile-details small">
+                        <p class="mb-3" style="color: rgba(255, 255, 255, 0.95) !important;">
+                            <i class="fas fa-envelope me-2"></i>
+                            {{ user.email }}
+                        </p>
+                        <p class="mb-3" style="color: rgba(255, 255, 255, 0.95) !important;">
+                            <i class="fas fa-phone me-2"></i>
+                            {{ user.phone or 'Not provided' }}
+                        </p>
+                        {% if user.address %}
+                        <p class="mb-0" style="color: rgba(255, 255, 255, 0.95) !important;">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            {{ user.address[:30] }}...
+                        </p>
+                        {% endif %}
+                    </div>
+                    <hr class="border-white border-opacity-25">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('users.edit_user', user_id=user.user_id) }}" class="btn btn-light ripple-btn">
+                            <i class="fas fa-edit me-2"></i> Edit Profile
+                        </a>
+                        <a href="{{ url_for('feedback.list_feedback') }}" class="btn btn-outline-light ripple-btn">
+                            <i class="fas fa-comments me-2"></i> My Reviews
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Section -->
+    {% if stats.recommendations %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="section-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; border-radius: 15px !important; padding: 1.5rem 2rem !important; color: white !important; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3) !important; margin-bottom: 1.5rem !important;">
+                <h5 class="mb-0" style="color: white !important; font-weight: 800;"><i class="fas fa-magic me-2"></i> Recommended for You</h5>
+                <small style="color: rgba(255, 255, 255, 0.9) !important;">Based on your order history</small>
+            </div>
+            <div class="row">
+                {% for recommendation in stats.recommendations %}
+                <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                    <div class="recommendation-card h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; border-radius: 20px !important; padding: 1.5rem !important; color: white !important; box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3) !important; border: 2px solid rgba(255, 255, 255, 0.2); transition: transform 0.3s ease;">
+                        <div class="card-body text-center p-3" style="padding: 0 !important;">
+                            <i class="fas fa-utensils fa-3x mb-3" style="color: white !important;"></i>
+                            <h6 class="card-title mb-2 fw-bold" style="color: white !important;">{{ recommendation.menu_item.name[:20] }}{% if recommendation.menu_item.name|length > 20 %}...{% endif %}</h6>
+                            <p class="card-text fw-bold mb-3" style="color: #a8ff78 !important;">₹{{ "%.0f"|format(recommendation.menu_item.price) }}</p>
+                            <button class="btn btn-light btn-sm w-100" 
+                                    onclick="addToCart({{ recommendation.menu_item.menu_item_id }}, '{{ recommendation.menu_item.name }}', {{ recommendation.menu_item.price }})" style="font-weight: 600;">
+                                <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Reorder Section -->
+    {% if stats.recent_orders %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="section-header" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%) !important; border-radius: 15px !important; padding: 1.5rem 2rem !important; color: white !important; box-shadow: 0 10px 30px rgba(48, 207, 208, 0.3) !important; margin-bottom: 1rem !important;">
+                <h5 class="mb-0" style="color: white !important; font-weight: 800;"><i class="fas fa-redo me-2"></i> Quick Reorder</h5>
+            </div>
+            <p class="mb-3 ms-2" style="color: white !important; opacity: 0.9;">Order again from your recent purchases</p>
+            <div class="row">
+                {% for order in stats.recent_orders[:3] %}
+                <div class="col-md-4 mb-3">
+                    <div class="reorder-card h-100" style="background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%) !important; border-radius: 20px !important; padding: 1.5rem !important; color: white !important; box-shadow: 0 10px 25px rgba(142, 197, 252, 0.3) !important; border: 2px solid rgba(255, 255, 255, 0.2);">
+                        <div class="card-body" style="padding: 0 !important;">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h6 class="card-title fw-bold" style="color: white !important;">Order #{{ order.order_id }}</h6>
+                                <span class="badge bg-white" style="color: #8ec5fc !important; font-weight: 600;">{{ order.order_date.strftime('%b %d') }}</span>
+                            </div>
+                            <p class="card-text small mb-2" style="color: rgba(255, 255, 255, 0.95) !important;">
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ order.order_date.strftime('%B %d, %Y') }}
+                            </p>
+                            <p class="card-text mb-3">
+                                <strong style="color: white !important; font-size: 1.2rem;">₹{{ "%.2f"|format(order.total_amount) }}</strong>
+                            </p>
+                            <a href="{{ url_for('orders.view_order', order_id=order.order_id) }}" 
+                               class="btn btn-light btn-sm w-100 ripple-btn" style="font-weight: 600;">
+                                <i class="fas fa-redo me-2"></i> Reorder
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ===== ENHANCED PARTICLE ANIMATION SYSTEM =====
+function createParticles() {
+    const container = document.getElementById('particleContainer');
+    const particleCount = 50; // More particles for vibrant effect
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random positioning
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        
+        // Random size variation
+        const size = Math.random() * 6 + 4;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        
+        // Random animation delay and duration
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        
+        container.appendChild(particle);
+    }
+}
+
+// ===== FLOATING FOOD ICONS =====
+function createFoodIcons() {
+    const foodIcons = ['🍕', '🍔', '🍜', '🍰', '🍱', '🍣', '🍝', '🌮', '🍦', '🧁'];
+    const body = document.body;
+    
+    for (let i = 0; i < 15; i++) {
+        const icon = document.createElement('div');
+        icon.className = 'food-icon-float';
+        icon.textContent = foodIcons[Math.floor(Math.random() * foodIcons.length)];
+        icon.style.left = Math.random() * 100 + '%';
+        icon.style.top = Math.random() * 100 + '%';
+        icon.style.animationDelay = Math.random() * 10 + 's';
+        icon.style.animationDuration = (Math.random() * 10 + 15) + 's';
+        body.appendChild(icon);
+    }
+}
+
+// ===== LIVE CLOCK WITH EMOJI =====
+function updateClock() {
+    const clockElement = document.getElementById('liveClock');
+    if (clockElement) {
+        const now = new Date();
+        const hour = now.getHours();
+        let emoji = '🌞';
+        if (hour >= 18 || hour < 6) emoji = '🌙';
+        else if (hour >= 12) emoji = '☀️';
+        
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        clockElement.innerHTML = emoji + ' ' + now.toLocaleString('en-US', options);
+    }
+}
+
+// ===== ANIMATED COUNTERS =====
+function animateCounter(element) {
+    const target = parseFloat(element.getAttribute('data-target'));
+    const duration = 2000; // 2 seconds
+    const increment = target / (duration / 16); // 60 FPS
+    let current = 0;
+    
+    const isCurrency = element.textContent.includes('₹') || target > 1000;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        
+        if (isCurrency) {
+            element.textContent = '₹' + Math.floor(current);
+        } else {
+            element.textContent = Math.floor(current);
+        }
+    }, 16);
+}
+
+// ===== RIPPLE EFFECT =====
+function createRipple(event) {
+    const button = event.currentTarget;
+    const ripple = document.createElement('span');
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+    
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.classList.add('ripple');
+    
+    button.appendChild(ripple);
+    
+    setTimeout(() => ripple.remove(), 600);
+}
+
+// ===== ADD TO CART FUNCTIONALITY =====
+function addToCart(itemId, itemName, itemPrice) {
+    // Show loading state
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<span class="loading"></span>';
+    button.disabled = true;
+    
+    // Create form data instead of JSON
+    const formData = new FormData();
+    formData.append('menu_item_id', itemId);
+    formData.append('quantity', 1);
+    formData.append('special_instructions', '');
+    
+    // This would integrate with your existing cart system
+    fetch('/orders/add_to_cart', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(`${itemName} added to cart!`, 'success');
+            button.innerHTML = '<i class="fas fa-check me-1"></i> Added!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        } else {
+            showNotification('Failed to add item to cart', 'error');
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error adding item to cart', 'error');
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+// ===== NOTIFICATION SYSTEM =====
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px; animation: slideInRight 0.5s ease;';
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideInRight 0.5s ease reverse';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 500);
+    }, 3000);
+}
+
+// ===== SMOOTH SCROLL ANIMATIONS =====
+function setupScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.glass-card, .stats-card, .favorites-card, .profile-card, .recommendation-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.6s ease';
+        observer.observe(el);
+    });
+}
+
+// ===== CONFETTI CELEBRATION =====
+function createConfetti() {
+    const colors = ['#FF6B6B', '#FFE66D', '#4FACFE', '#FF6B9D', '#4ECDC4'];
+    const confettiCount = 30;
+    
+    for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.animationDelay = Math.random() * 0.5 + 's';
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => confetti.remove(), 3000);
+        }, i * 50);
+    }
+}
+
+// ===== PAGE LOAD SEQUENCE =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Create particles and food icons
+    createParticles();
+    createFoodIcons();
+    
+    // Start live clock
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // Animate stat counters
+    document.querySelectorAll('.stat-number').forEach(counter => {
+        animateCounter(counter);
+    });
+    
+    // Setup ripple effects
+    document.querySelectorAll('.ripple-btn').forEach(button => {
+        button.addEventListener('click', createRipple);
+    });
+    
+    // Setup scroll animations
+    setupScrollAnimations();
+    
+    // Add enhanced hover effects to cards
+    document.querySelectorAll('.action-card, .recommendation-card, .reorder-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-15px) scale(1.05)';
+            // Add glow effect
+            this.classList.add('glow-effect');
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.classList.remove('glow-effect');
+        });
+    });
+    
+    // Add celebration confetti on page load
+    setTimeout(() => {
+        createConfetti();
+    }, 500);
+});
+
+// ===== AUTO REFRESH FOR ACTIVE ORDERS =====
+{% if stats.has_active_orders %}
+// Refresh the page every 60 seconds if there are active orders
+let refreshTimer = setInterval(() => {
+    showNotification('Refreshing order status...', 'info');
+    setTimeout(() => {
+        window.location.reload();
+    }, 1000);
+}, 60000);
+
+// Add manual refresh button to welcome banner
+document.addEventListener('DOMContentLoaded', function() {
+    const welcomeBanner = document.querySelector('.welcome-banner');
+    if (welcomeBanner) {
+        const refreshBtn = document.createElement('button');
+        refreshBtn.className = 'btn btn-light btn-sm ripple-btn ms-2';
+        refreshBtn.innerHTML = '<i class="fas fa-sync-alt me-1"></i> Refresh Orders';
+        refreshBtn.onclick = () => window.location.reload();
+        welcomeBanner.querySelector('.d-flex').appendChild(refreshBtn);
+    }
+});
+{% endif %}
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', function(e) {
+    // Alt + M: Browse Menu
+    if (e.altKey && e.key === 'm') {
+        e.preventDefault();
+        window.location.href = "{{ url_for('menu.list_menu') }}";
+    }
+    // Alt + C: View Cart
+    if (e.altKey && e.key === 'c') {
+        e.preventDefault();
+        window.location.href = "{{ url_for('orders.view_cart') }}";
+    }
+    // Alt + T: Track Orders
+    if (e.altKey && e.key === 't') {
+        e.preventDefault();
+        window.location.href = "{{ url_for('delivery.track') }}";
+    }
+    // Alt + H: Order History
+    if (e.altKey && e.key === 'h') {
+        e.preventDefault();
+        window.location.href = "{{ url_for('orders.list_orders') }}";
+    }
+});
+
+// ===== PERFORMANCE OPTIMIZATION =====
+// Lazy load images if any
+if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
+            }
+        });
+    });
+    
+    document.querySelectorAll('img.lazy').forEach(img => imageObserver.observe(img));
+}
+
+// ===== REAL-TIME CLOCK =====
+function updateClock() {
+    const now = new Date();
+    const options = { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    };
+    const timeString = now.toLocaleString('en-US', options);
+    const clockElement = document.getElementById('liveClock');
+    if (clockElement) {
+        clockElement.innerHTML = '<i class="fas fa-clock me-1"></i>' + timeString + ' 📅';
+    }
+}
+
+// Update clock immediately and then every second
+updateClock();
+setInterval(updateClock, 1000);
+
+console.log('🎉 Customer Dashboard Enhanced - v2.0');
+console.log('⚡ Keyboard Shortcuts: Alt+M (Menu) | Alt+C (Cart) | Alt+T (Track) | Alt+H (History)');
+</script>
+{% endblock %}

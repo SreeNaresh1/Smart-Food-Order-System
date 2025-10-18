@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Dashboard - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<style>
+    .employee-welcome-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+</style>
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="employee-welcome-box text-white rounded p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="mb-1"><i class="fas fa-user-tie"></i> Welcome, {{ user.name }}!</h1>
+                        <p class="mb-0 opacity-75">Employee Dashboard - {{ current_time }}</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-light text-primary fs-6">{{ user.role.title() }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">Orders to Prepare</h5>
+                            <h2 class="mb-0">{{ stats.preparing_orders or 0 }}</h2>
+                        </div>
+                        <i class="fas fa-fire fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">Ready for Delivery</h5>
+                            <h2 class="mb-0">{{ stats.ready_orders or 0 }}</h2>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">Assigned Tasks</h5>
+                            <h2 class="mb-0">{{ stats.assigned_orders or 0 }}</h2>
+                        </div>
+                        <i class="fas fa-tasks fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-0">Completed Today</h5>
+                            <h2 class="mb-0">{{ stats.today_completed or 0 }}</h2>
+                        </div>
+                        <i class="fas fa-trophy fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Current Tasks -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Current Tasks</h5>
+                    <a href="{{ url_for('orders.list_orders') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-eye"></i> View All Orders
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    {% if stats.my_tasks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Status</th>
+                                    <th>Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in stats.my_tasks %}
+                                <tr>
+                                    <td><strong>#{{ order.order_id }}</strong></td>
+                                    <td>{{ order.customer.name }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'warning' if order.status == 'Confirmed' else 'info' if order.status == 'Preparing' else 'success' }}">
+                                            {{ order.status.title() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ order.order_date.strftime('%H:%M') }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('orders.view_order', order_id=order.order_id) }}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if order.status == 'Confirmed' %}
+                                            <form method="POST" action="{{ url_for('orders.update_order_status', order_id=order.order_id) }}" class="d-inline">
+                                                <input type="hidden" name="status" value="Preparing">
+                                                <button type="submit" class="btn btn-warning btn-sm" title="Start Preparing">
+                                                    <i class="fas fa-play"></i>
+                                                </button>
+                                            </form>
+                                            {% elif order.status == 'Preparing' %}
+                                            <form method="POST" action="{{ url_for('orders.update_order_status', order_id=order.order_id) }}" class="d-inline">
+                                                <input type="hidden" name="status" value="Ready">
+                                                <button type="submit" class="btn btn-success btn-sm" title="Mark Ready">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No pending tasks</h5>
+                        <p class="text-muted">Great job! All orders are up to date.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Profile -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('menu.list_menu') }}" class="btn btn-primary">
+                            <i class="fas fa-utensils"></i> View Menu
+                        </a>
+                        <a href="{{ url_for('orders.list_orders') }}" class="btn btn-info">
+                            <i class="fas fa-list"></i> View All Orders
+                        </a>
+                        <a href="{{ url_for('menu.list_menu') }}" class="btn btn-secondary">
+                            <i class="fas fa-book"></i> View Menu
+                        </a>
+                        <a href="{{ url_for('delivery.track') }}" class="btn btn-success">
+                            <i class="fas fa-truck"></i> Delivery Tracking
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Profile -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> My Profile</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-user-circle fa-4x text-muted"></i>
+                        <h6 class="mt-2 mb-0">{{ user.name }}</h6>
+                        <small class="text-muted">{{ user.role.title() }}</small>
+                    </div>
+                    <hr>
+                    <div class="small">
+                        <p class="mb-2"><i class="fas fa-envelope text-muted"></i> {{ user.email }}</p>
+                        <p class="mb-2"><i class="fas fa-phone text-muted"></i> {{ user.phone or 'Not provided' }}</p>
+                        <p class="mb-0"><i class="fas fa-calendar text-muted"></i> Joined: {{ user.created_date.strftime('%B %Y') }}</p>
+                    </div>
+                    <hr>
+                    <div class="d-grid">
+                        <a href="{{ url_for('users.edit_user', user_id=user.user_id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Today's Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <i class="fas fa-fire fa-2x text-warning mb-2"></i>
+                                <h4 class="mb-0">{{ stats.preparing_orders or 0 }}</h4>
+                                <small class="text-muted">Currently Preparing</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                <h4 class="mb-0">{{ stats.ready_orders or 0 }}</h4>
+                                <small class="text-muted">Ready for Delivery</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <i class="fas fa-trophy fa-2x text-primary mb-2"></i>
+                                <h4 class="mb-0">{{ stats.today_completed or 0 }}</h4>
+                                <small class="text-muted">Completed Today</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                                <h4 class="mb-0">{{ current_time.split(' ')[1] }}</h4>
+                                <small class="text-muted">Current Time</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh dashboard every 30 seconds for real-time updates
+setInterval(function() {
+    // Only refresh if there are active orders to avoid unnecessary requests
+    {% if stats.preparing_orders or stats.ready_orders %}
+    window.location.reload();
+    {% endif %}
+}, 30000);
+
+// Confirmation for status updates
+document.addEventListener('DOMContentLoaded', function() {
+    const statusForms = document.querySelectorAll('form[action*="update_order_status"]');
+    statusForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const status = form.querySelector('input[name="status"]').value;
+            const statusText = status === 'preparing' ? 'start preparing' : 'mark as ready';
+            if (!confirm(`Are you sure you want to ${statusText} this order?`)) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

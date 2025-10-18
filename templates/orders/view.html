@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Order Details - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-receipt"></i> Order Details</h1>
+                <div>
+                    <a href="{{ url_for('orders.list_orders') }}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left"></i> Back to Orders
+                    </a>
+                    {% if order.status in ['confirmed', 'preparing', 'ready'] %}
+                    <a href="{{ url_for('delivery.track_delivery', order_id=order.order_id) }}" class="btn btn-primary">
+                        <i class="fas fa-truck"></i> Track Delivery
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Order Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Order #{{ order.order_id }}</h5>
+                        <span class="badge bg-{{ 'success' if order.status == 'Delivered' else 'warning' if order.status == 'Pending' else 'info' }}">
+                            {{ order.status.title() }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Order Information</h6>
+                            <p><strong>Order Date:</strong> {{ order.order_date.strftime('%B %d, %Y at %H:%M') }}</p>
+                            <p><strong>Customer:</strong> {{ order.customer.name }}</p>
+                            <p><strong>Phone:</strong> {{ order.customer.phone }}</p>
+                            <p><strong>Email:</strong> {{ order.customer.email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Delivery Information</h6>
+                            <p><strong>Delivery Address:</strong></p>
+                            <address class="text-muted">{{ order.delivery_address }}</address>
+                            {% if order.estimated_time %}
+                            <p><strong>Estimated Delivery:</strong> {{ order.estimated_time.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-utensils"></i> Ordered Items</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Price</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detail in order_details %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">{{ detail.menu_item.name }}</h6>
+                                                {% if detail.menu_item.description %}
+                                                <small class="text-muted">{{ detail.menu_item.description[:50] }}...</small>
+                                                {% endif %}
+                                                {% if detail.special_instructions %}
+                                                <br><small class="text-info"><i class="fas fa-sticky-note"></i> {{ detail.special_instructions }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>₹{{ "%.2f"|format(detail.unit_price) }}</td>
+                                    <td class="text-center">{{ detail.quantity }}</td>
+                                    <td class="text-end">₹{{ "%.2f"|format(detail.sub_total) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Order Summary -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-calculator"></i> Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    {% set subtotal = order_details|sum(attribute='sub_total')|float if order_details else 0 %}
+                    {% set tax = (subtotal * 0.1) %}
+                    {% set delivery_fee = 30.0 %}
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>₹{{ "%.2f"|format(subtotal) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Delivery Fee:</span>
+                        <span>₹{{ "%.2f"|format(delivery_fee) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax (10%):</span>
+                        <span>₹{{ "%.2f"|format(tax) }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong>₹{{ "%.2f"|format(order.total_amount) }}</strong>
+                    </div>
+                    
+                    <!-- Payment Status -->
+                    <div class="text-center">
+                        {% if order.payment %}
+                        <span class="badge bg-success fs-6">
+                            <i class="fas fa-check-circle"></i> Payment Completed
+                        </span>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                Method: {{ order.payment.payment_method.title() }}<br>
+                                Date: {{ order.payment.payment_date.strftime('%Y-%m-%d %H:%M') }}
+                            </small>
+                        </div>
+                        {% else %}
+                        <span class="badge bg-warning fs-6">
+                            <i class="fas fa-clock"></i> Payment Pending
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Actions -->
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cogs"></i> Actions</h5>
+                </div>
+                <div class="card-body">
+                    {% if session.user_role in ['admin', 'staff', 'employee'] %}
+                    <!-- Admin/Staff Actions -->
+                    <form method="POST" action="{{ url_for('orders.update_order_status', order_id=order.order_id) }}" class="mb-3">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Update Status:</label>
+                            <select name="status" id="status" class="form-select" required>
+                                <option value="Pending" {{ 'selected' if order.status == 'Pending' else '' }}>Pending</option>
+                                <option value="Confirmed" {{ 'selected' if order.status == 'Confirmed' else '' }}>Confirmed</option>
+                                <option value="Preparing" {{ 'selected' if order.status == 'Preparing' else '' }}>Preparing</option>
+                                <option value="Ready" {{ 'selected' if order.status == 'Ready' else '' }}>Ready for Delivery</option>
+                                <option value="Delivered" {{ 'selected' if order.status == 'Delivered' else '' }}>Delivered</option>
+                                <option value="Cancelled" {{ 'selected' if order.status == 'Cancelled' else '' }}>Cancelled</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save"></i> Update Status
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <!-- Customer Actions -->
+                    {% if session.user_role == 'customer' %}
+                        {% if order.status == 'Delivered' %}
+                        <a href="{{ url_for('feedback.create_feedback', order_id=order.order_id) }}" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-star"></i> Rate & Review
+                        </a>
+                        {% endif %}
+                        {% if order.status in ['Pending', 'Confirmed'] %}
+                        <button class="btn btn-danger w-100 mb-2" onclick="cancelOrder({{ order.order_id }})">
+                            <i class="fas fa-times"></i> Cancel Order
+                        </button>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- Common Actions -->
+                    <a href="{{ url_for('menu.list_menu') }}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-redo"></i> Order Again
+                    </a>
+                    
+                    {% if order.status in ['confirmed', 'preparing', 'ready'] %}
+                    <a href="{{ url_for('delivery.track_delivery', order_id=order.order_id) }}" class="btn btn-info w-100">
+                        <i class="fas fa-map-marker-alt"></i> Track Order
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this order?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Order</button>
+                <form method="POST" action="{{ url_for('orders.update_order_status', order_id=order.order_id) }}" style="display: inline;">
+                    <input type="hidden" name="status" value="Cancelled">
+                    <button type="submit" class="btn btn-danger">Cancel Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function cancelOrder(orderId) {
+    var modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+    modal.show();
+}
+
+// Auto-refresh for active orders
+{% if order.status in ['Confirmed', 'Preparing'] %}
+setTimeout(function() {
+    window.location.reload();
+}, 60000); // Refresh every minute for active orders
+{% endif %}
+</script>
+{% endblock %}

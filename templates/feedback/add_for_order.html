@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Feedback - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-star"></i> Rate Your Order Experience</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Order Info -->
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="fas fa-receipt"></i> Order #{{ order.order_id }}</h5>
+                        <p class="mb-0">
+                            <strong>Order Date:</strong> {{ order.order_date.strftime('%B %d, %Y at %H:%M') }}<br>
+                            <strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total_amount) }}<br>
+                            <strong>Status:</strong> <span class="badge bg-success">{{ order.status.title() }}</span>
+                        </p>
+                    </div>
+
+                    <!-- Feedback Form -->
+                    <form method="POST" id="feedbackForm">
+                        <!-- Rating Section -->
+                        <div class="mb-4">
+                            <label for="rating" class="form-label">
+                                <i class="fas fa-star text-warning"></i> Overall Rating *
+                            </label>
+                            <div class="rating-container mb-3">
+                                <div class="star-rating" id="starRating">
+                                    <span class="star" data-rating="1">&#9733;</span>
+                                    <span class="star" data-rating="2">&#9733;</span>
+                                    <span class="star" data-rating="3">&#9733;</span>
+                                    <span class="star" data-rating="4">&#9733;</span>
+                                    <span class="star" data-rating="5">&#9733;</span>
+                                </div>
+                                <div class="rating-text" id="ratingText">Please rate your experience</div>
+                            </div>
+                            <input type="hidden" id="rating" name="rating" required>
+                        </div>
+
+                        <!-- Feedback Type -->
+                        <div class="mb-4">
+                            <label for="feedback_type" class="form-label">
+                                <i class="fas fa-tags"></i> Feedback Category *
+                            </label>
+                            <select class="form-select" id="feedback_type" name="feedback_type" required>
+                                <option value="">Select feedback category...</option>
+                                <option value="Food Quality">Food Quality</option>
+                                <option value="Delivery Service">Delivery Service</option>
+                                <option value="Customer Service">Customer Service</option>
+                                <option value="App Experience">App Experience</option>
+                                <option value="Overall Experience">Overall Experience</option>
+                                <option value="Suggestion">Suggestion</option>
+                                <option value="Complaint">Complaint</option>
+                            </select>
+                        </div>
+
+                        <!-- Comments -->
+                        <div class="mb-4">
+                            <label for="comments" class="form-label">
+                                <i class="fas fa-comment"></i> Your Comments *
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="comments" 
+                                name="comments" 
+                                rows="5" 
+                                placeholder="Share your experience with us... Tell us what you loved, what could be improved, or any suggestions you have."
+                                required
+                            ></textarea>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i> 
+                                Your feedback helps us improve our service. Please be specific about your experience.
+                            </div>
+                        </div>
+
+                        <!-- Quick Feedback Options -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-check-square"></i> Quick Feedback (Optional)
+                            </label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="hotFood" name="quick_feedback" value="Food was hot">
+                                        <label class="form-check-label" for="hotFood">
+                                            Food was served hot
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="onTime" name="quick_feedback" value="Delivered on time">
+                                        <label class="form-check-label" for="onTime">
+                                            Delivered on time
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="freshFood" name="quick_feedback" value="Fresh ingredients">
+                                        <label class="form-check-label" for="freshFood">
+                                            Fresh ingredients
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="goodPortion" name="quick_feedback" value="Good portion size">
+                                        <label class="form-check-label" for="goodPortion">
+                                            Good portion size
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="politeStaff" name="quick_feedback" value="Polite delivery staff">
+                                        <label class="form-check-label" for="politeStaff">
+                                            Polite delivery staff
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="goodPackaging" name="quick_feedback" value="Good packaging">
+                                        <label class="form-check-label" for="goodPackaging">
+                                            Good packaging
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('orders.view_order', order_id=order.order_id) }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Order
+                            </a>
+                            <div>
+                                <button type="reset" class="btn btn-outline-danger me-2">
+                                    <i class="fas fa-undo"></i> Reset
+                                </button>
+                                <button type="submit" class="btn btn-success" id="submitBtn">
+                                    <i class="fas fa-paper-plane"></i> Submit Feedback
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Thank You Note -->
+            <div class="alert alert-light mt-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-heart text-danger fa-2x me-3"></i>
+                    <div>
+                        <h6 class="mb-1">Thank you for choosing us!</h6>
+                        <p class="mb-0 text-muted">Your feedback is valuable to us and helps us serve you better.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.star-rating {
+    font-size: 2.5rem;
+    color: #ddd;
+    cursor: pointer;
+    user-select: none;
+}
+
+.star-rating .star {
+    transition: color 0.3s;
+    margin-right: 0.1rem;
+}
+
+.star-rating .star:hover,
+.star-rating .star.active {
+    color: #ffc107;
+}
+
+.rating-text {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+.form-check {
+    margin-bottom: 0.5rem;
+}
+
+.alert-light {
+    border-left: 4px solid #007bff;
+}
+
+.rating-container {
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    border: 1px solid #dee2e6;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+    const ratingText = document.getElementById('ratingText');
+    const form = document.getElementById('feedbackForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const ratingMessages = {
+        1: "Poor - We're sorry for the bad experience",
+        2: "Fair - We can do better",
+        3: "Good - Thanks for your feedback", 
+        4: "Very Good - We're glad you enjoyed it",
+        5: "Excellent - Thank you for the amazing rating!"
+    };
+
+    // Star rating functionality
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const rating = parseInt(this.dataset.rating);
+            highlightStars(rating);
+        });
+
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.dataset.rating);
+            ratingInput.value = rating;
+            highlightStars(rating);
+            ratingText.textContent = ratingMessages[rating];
+            ratingText.style.color = rating >= 4 ? '#28a745' : rating >= 3 ? '#ffc107' : '#dc3545';
+        });
+    });
+
+    document.getElementById('starRating').addEventListener('mouseleave', function() {
+        const currentRating = parseInt(ratingInput.value);
+        if (currentRating) {
+            highlightStars(currentRating);
+        } else {
+            highlightStars(0);
+        }
+    });
+
+    function highlightStars(rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        if (!ratingInput.value) {
+            e.preventDefault();
+            alert('Please select a rating before submitting.');
+            return;
+        }
+
+        // Collect quick feedback options
+        const quickFeedback = [];
+        const checkboxes = document.querySelectorAll('input[name="quick_feedback"]:checked');
+        checkboxes.forEach(cb => quickFeedback.push(cb.value));
+        
+        if (quickFeedback.length > 0) {
+            const commentsField = document.getElementById('comments');
+            const currentComments = commentsField.value.trim();
+            const quickFeedbackText = '\n\nQuick Feedback:\n- ' + quickFeedback.join('\n- ');
+            commentsField.value = currentComments + quickFeedbackText;
+        }
+
+        // Disable submit button to prevent double submission
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    });
+
+    // Reset functionality
+    document.querySelector('button[type="reset"]').addEventListener('click', function() {
+        ratingInput.value = '';
+        highlightStars(0);
+        ratingText.textContent = 'Please rate your experience';
+        ratingText.style.color = '#6c757d';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-shopping-cart"></i> Checkout
+            </h1>
+        </div>
+    </div>
+    
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Order Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ item.menu_item.name }}</strong>
+                                        <br><small class="text-muted">{{ item.menu_item.description }}</small>
+                                        {% if item.special_instructions %}
+                                        <br><small class="text-info">Note: {{ item.special_instructions }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₹{{ "%.2f"|format(item.menu_item.price|float) }}</td>
+                                    <td>₹{{ "%.2f"|format(item.sub_total|float) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3"><strong>Subtotal:</strong></td>
+                                    <td><strong>₹{{ "%.2f"|format(total_amount|float) }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">Tax (10%):</td>
+                                    <td>₹{{ "%.2f"|format((total_amount|float) * 0.1) }}</td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td colspan="3"><strong>Total Amount:</strong></td>
+                                    <td><strong>₹{{ "%.2f"|format((total_amount|float) * 1.1) }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Delivery Address -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Delivery Address</h5>
+                </div>
+                <div class="card-body">
+                    <p><i class="fas fa-map-marker-alt"></i> {{ user.address }}</p>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        If you need to change the delivery address, please update it in your profile.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Payment Section -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-credit-card"></i> Payment Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="paymentForm" method="POST" action="{{ url_for('orders.process_payment') }}">
+                        <!-- Payment Method Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Select Payment Method:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" value="upi" id="upi" checked>
+                                <label class="form-check-label" for="upi">
+                                    <i class="fas fa-mobile-alt"></i> UPI Payment
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" value="cash" id="cash">
+                                <label class="form-check-label" for="cash">
+                                    <i class="fas fa-money-bill-wave"></i> Cash on Delivery
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" value="card" id="card">
+                                <label class="form-check-label" for="card">
+                                    <i class="fas fa-credit-card"></i> Credit/Debit Card
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- UPI Payment Details -->
+                        <div id="upi-details" class="payment-details">
+                            <div class="mb-3">
+                                <label for="upi_id" class="form-label">UPI ID <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="upi_id" name="upi_id" placeholder="yourname@upi">
+                                <small class="form-text text-muted">Enter your UPI ID (e.g., 9876543210@paytm)</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="upi_pin" class="form-label">UPI PIN <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="upi_pin" name="upi_pin" maxlength="6">
+                                <small class="form-text text-muted">Enter your 6-digit UPI PIN</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Cash on Delivery Details -->
+                        <div id="cash-details" class="payment-details" style="display: none;">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                You can pay in cash when the order is delivered to your address.
+                                Please keep exact change ready.
+                            </div>
+                        </div>
+                        
+                        <!-- Card Payment Details -->
+                        <div id="card-details" class="payment-details" style="display: none;">
+                            <div class="mb-3">
+                                <label for="card_number" class="form-label">Card Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="card_number" name="card_number" maxlength="19" placeholder="1234 5678 9012 3456">
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="expiry" class="form-label">Expiry <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="expiry" name="expiry" placeholder="MM/YY">
+                                </div>
+                                <div class="col-6">
+                                    <label for="cvv" class="form-label">CVV <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="cvv" name="cvv" maxlength="3">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Total Amount Display -->
+                        <div class="mb-3 text-center">
+                            <h4 class="text-success">
+                                Total: ₹{{ "%.2f"|format((total_amount|float) * 1.1) }}
+                            </h4>
+                        </div>
+                        
+                        <!-- Special Instructions -->
+                        <div class="mb-3">
+                            <label for="special_instructions" class="form-label">Special Instructions (Optional)</label>
+                            <textarea class="form-control" id="special_instructions" name="special_instructions" rows="2" placeholder="Any special requests for your order..."></textarea>
+                        </div>
+                        
+                        <!-- Hidden fields -->
+                        <input type="hidden" name="total_amount" value="{{ (total_amount|float) * 1.1 }}">
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="button" id="proceedToPay" class="btn btn-success btn-lg">
+                                <i class="fas fa-lock"></i> Proceed to Pay
+                            </button>
+                            <button type="submit" id="payNow" class="btn btn-primary btn-lg" style="display: none;">
+                                <i class="fas fa-credit-card"></i> Pay Now
+                            </button>
+                            <a href="{{ url_for('orders.view_cart') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Cart
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h4>Your cart is empty</h4>
+                    <p class="text-muted">Add some delicious items to your cart before checkout.</p>
+                    <a href="{{ url_for('menu.list_menu') }}" class="btn btn-primary">
+                        <i class="fas fa-utensils"></i> Browse Menu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Payment method toggle
+    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+    const paymentDetails = document.querySelectorAll('.payment-details');
+    
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', function() {
+            // Hide all payment details
+            paymentDetails.forEach(detail => {
+                detail.style.display = 'none';
+            });
+            
+            // Show selected payment details
+            const selectedDetail = document.getElementById(this.value + '-details');
+            if (selectedDetail) {
+                selectedDetail.style.display = 'block';
+            }
+        });
+    });
+    
+    // Proceed to Pay button logic
+    const proceedBtn = document.getElementById('proceedToPay');
+    const payBtn = document.getElementById('payNow');
+    const form = document.getElementById('paymentForm');
+    
+    proceedBtn.addEventListener('click', function() {
+        const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        
+        if (selectedPaymentMethod === 'upi') {
+            const upiId = document.getElementById('upi_id').value;
+            const upiPin = document.getElementById('upi_pin').value;
+            
+            if (!upiId || !upiPin) {
+                alert('Please enter UPI ID and PIN');
+                return;
+            }
+            
+            if (upiPin.length !== 6) {
+                alert('UPI PIN must be 6 digits');
+                return;
+            }
+        } else if (selectedPaymentMethod === 'card') {
+            const cardNumber = document.getElementById('card_number').value;
+            const expiry = document.getElementById('expiry').value;
+            const cvv = document.getElementById('cvv').value;
+            
+            if (!cardNumber || !expiry || !cvv) {
+                alert('Please fill all card details');
+                return;
+            }
+        }
+        
+        // Show pay button and hide proceed button
+        proceedBtn.style.display = 'none';
+        payBtn.style.display = 'block';
+        payBtn.innerHTML = '<i class="fas fa-credit-card"></i> Pay ₹{{ "%.2f"|format((total_amount|float) * 1.1) }}';
+    });
+    
+    // Card number formatting
+    const cardInput = document.getElementById('card_number');
+    if (cardInput) {
+        cardInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+            this.value = value;
+        });
+    }
+    
+    // Expiry formatting
+    const expiryInput = document.getElementById('expiry');
+    if (expiryInput) {
+        expiryInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            this.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}

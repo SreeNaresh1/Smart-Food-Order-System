@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - Smart Food Ordering System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
+        </div>
+    </div>
+    
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Cart Items</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="cart-item row align-items-center mb-3 pb-3 border-bottom" data-price="{{ item.menu_item.price }}">
+                        <div class="col-md-2">
+                            <img src="{{ url_for('static', filename='images/' + (item.menu_item.image or 'default-food.jpg')) }}" 
+                                 class="img-fluid rounded" alt="{{ item.menu_item.name }}"
+                                 onerror="this.src='https://via.placeholder.com/100x80?text=Food'">
+                        </div>
+                        <div class="col-md-4">
+                            <h6>{{ item.menu_item.name }}</h6>
+                            <p class="text-muted small">{{ item.menu_item.description[:50] }}...</p>
+                            <p class="text-success">₹{{ "%.2f"|format(item.menu_item.price) }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="quantity-selector">
+                                <button type="button" class="quantity-btn btn btn-outline-secondary btn-sm" data-action="decrease">-</button>
+                                <input type="number" class="quantity-input form-control form-control-sm d-inline-block mx-2" 
+                                       value="{{ item.quantity }}" min="1" max="10" style="width: 60px;">
+                                <button type="button" class="quantity-btn btn btn-outline-secondary btn-sm" data-action="increase">+</button>
+                            </div>
+                            {% if item.special_instructions %}
+                            <small class="text-info d-block mt-1">Note: {{ item.special_instructions }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <div class="item-total h6">₹{{ "%.2f"|format(item.sub_total) }}</div>
+                        </div>
+                        <div class="col-md-1">
+                            <form method="POST" action="{{ url_for('orders.remove_from_cart', menu_item_id=item.menu_item.menu_item_id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span id="cart-subtotal">₹{{ "%.2f"|format(total_amount|float) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax (10%):</span>
+                        <span id="cart-tax">₹{{ "%.2f"|format((total_amount|float) * 0.1) }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong id="cart-total">₹{{ "%.2f"|format((total_amount|float) * 1.1) }}</strong>
+                    </div>
+                    
+                    <a href="{{ url_for('orders.create_order') }}" class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-check"></i> Proceed to Checkout
+                    </a>
+                    <a href="{{ url_for('menu.list_menu') }}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-plus"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h4>Your cart is empty</h4>
+                    <p class="text-muted">Add some delicious items to your cart!</p>
+                    <a href="{{ url_for('menu.list_menu') }}" class="btn btn-primary">
+                        <i class="fas fa-utensils"></i> Browse Menu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if cart_items %}
+    <div class="row mt-3">
+        <div class="col-12">
+            <form method="POST" action="{{ url_for('orders.clear_cart') }}" class="d-inline">
+                <button type="submit" class="btn btn-outline-warning" 
+                        onclick="return confirm('Are you sure you want to clear your cart?')">
+                    <i class="fas fa-broom"></i> Clear Cart
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Update cart totals when quantities change
+function updateCartTotals() {
+    let subtotal = 0;
+    const cartItems = document.querySelectorAll('.cart-item');
+    
+    cartItems.forEach(function(item) {
+        const quantity = parseInt(item.querySelector('.quantity-input').value) || 0;
+        const price = parseFloat(item.dataset.price) || 0;
+        const itemTotal = quantity * price;
+        
+        const totalElement = item.querySelector('.item-total');
+        if (totalElement) {
+            totalElement.textContent = '₹' + itemTotal.toFixed(2);
+        }
+        
+        subtotal += itemTotal;
+    });
+    
+    // Update subtotal
+    const subtotalElement = document.getElementById('cart-subtotal');
+    if (subtotalElement) {
+        subtotalElement.textContent = '₹' + subtotal.toFixed(2);
+    }
+    
+    // Calculate tax (10% tax)
+    const tax = subtotal * 0.1;
+    const taxElement = document.getElementById('cart-tax');
+    if (taxElement) {
+        taxElement.textContent = '₹' + tax.toFixed(2);
+    }
+    
+    // Calculate total
+    const total = subtotal + tax;
+    const totalElement = document.getElementById('cart-total');
+    if (totalElement) {
+        totalElement.textContent = '₹' + total.toFixed(2);
+    }
+}
+
+// Quantity selectors
+document.querySelectorAll('.quantity-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var input = this.parentElement.querySelector('.quantity-input');
+        var currentValue = parseInt(input.value) || 0;
+        var action = this.dataset.action;
+        
+        if (action === 'increase') {
+            input.value = currentValue + 1;
+        } else if (action === 'decrease' && currentValue > 1) {
+            input.value = currentValue - 1;
+        }
+        
+        updateCartTotals();
+    });
+});
+
+// Update totals when quantities change manually
+document.querySelectorAll('.quantity-input').forEach(function(input) {
+    input.addEventListener('change', function() {
+        updateCartTotals();
+    });
+});
+</script>
+{% endblock %}

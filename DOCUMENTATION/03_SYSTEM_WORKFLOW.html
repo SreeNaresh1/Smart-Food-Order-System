@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Workflow Documentation - Smart Food Ordering System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            padding: 0;
+            list-style: none;
+            border-bottom: 3px solid #667eea;
+            overflow-x: auto;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-tabs li {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .nav-tabs button {
+            width: 100%;
+            padding: 15px 10px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #555;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tabs button:hover {
+            background: #e9ecef;
+            color: #667eea;
+        }
+
+        .nav-tabs button.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .workflow-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .workflow-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .flowchart {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        .step-box {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .step-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .step-box p {
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .step-box ul {
+            margin-left: 20px;
+            color: #666;
+        }
+
+        .step-box ul li {
+            margin: 5px 0;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .feature-card h4 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .feature-card p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .toc h3 {
+            color: #667eea;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc ul li {
+            margin: 10px 0;
+        }
+
+        .toc ul li a {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .toc ul li a:hover {
+            color: #667eea;
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .nav-tabs, .print-btn {
+                display: none;
+            }
+            .workflow-section {
+                display: block !important;
+                page-break-after: always;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            .content {
+                padding: 20px;
+            }
+            .nav-tabs {
+                flex-direction: column;
+            }
+            .nav-tabs li {
+                width: 100%;
+            }
+        }
+
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .workflow-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔄 System Workflow Documentation</h1>
+            <p>Smart Food Ordering System - Complete Process Flows</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">Generated: October 18, 2025</p>
+        </header>
+
+        <ul class="nav-tabs">
+            <li><button class="tab-btn active" data-tab="overview">📋 Overview</button></li>
+            <li><button class="tab-btn" data-tab="auth">🔐 Authentication</button></li>
+            <li><button class="tab-btn" data-tab="order">🛒 Customer Order</button></li>
+            <li><button class="tab-btn" data-tab="processing">⚙️ Order Processing</button></li>
+            <li><button class="tab-btn" data-tab="employee">👥 Employee Assignment</button></li>
+            <li><button class="tab-btn" data-tab="payment">💳 Payment</button></li>
+            <li><button class="tab-btn" data-tab="delivery">🚚 Delivery</button></li>
+            <li><button class="tab-btn" data-tab="feedback">⭐ Feedback</button></li>
+            <li><button class="tab-btn" data-tab="admin">👨‍💼 Admin</button></li>
+        </ul>
+
+        <div class="content">
+            <!-- Overview Section -->
+            <section class="workflow-section active" id="overview">
+                <div class="workflow-title">
+                    <span class="icon">📋</span>
+                    <h2>Table of Contents</h2>
+                </div>
+
+                <div class="toc">
+                    <h3>System Workflows Covered:</h3>
+                    <ul>
+                        <li>🔐 <a href="#" data-tab="auth">User Authentication Workflow</a></li>
+                        <li>🛒 <a href="#" data-tab="order">Customer Order Workflow</a></li>
+                        <li>⚙️ <a href="#" data-tab="processing">Order Processing Workflow</a></li>
+                        <li>👥 <a href="#" data-tab="employee">Employee Assignment Workflow</a></li>
+                        <li>💳 <a href="#" data-tab="payment">Payment Processing Workflow</a></li>
+                        <li>🚚 <a href="#" data-tab="delivery">Delivery Management Workflow</a></li>
+                        <li>⭐ <a href="#" data-tab="feedback">Feedback Collection Workflow</a></li>
+                        <li>👨‍💼 <a href="#" data-tab="admin">Admin Management Workflow</a></li>
+                    </ul>
+                </div>
+
+                <h3>Key Workflow Features</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h4>🔒 Concurrency Handling</h4>
+                        <p>Database locks, transaction management, and race condition prevention</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>⚡ Error Handling</h4>
+                        <p>Try-catch blocks, automatic rollback, and user notifications</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🚀 Performance Optimization</h4>
+                        <p>Lazy loading, query optimization, and session-based caching</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔄 Session Management</h4>
+                        <p>Server-side sessions with 30-minute timeout</p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>📖 About This Documentation</h4>
+                    <p>This comprehensive workflow documentation provides detailed process flows for all major operations in the Smart Food Ordering System. Each workflow includes visual flowcharts, step-by-step descriptions, and key decision points.</p>
+                </div>
+            </section>
+
+            <!-- Authentication Workflow -->
+            <section class="workflow-section" id="auth">
+                <div class="workflow-title">
+                    <span class="icon">🔐</span>
+                    <h2>User Authentication Workflow</h2>
+                </div>
+
+                <h3>Login Process</h3>
+                <div class="flowchart">┌─────────────────────────────────────────────────────────────┐
+│                     LOGIN WORKFLOW                           │
+└─────────────────────────────────────────────────────────────┘
+
+START
+  │
+  ▼
+┌─────────────────────┐
+│ User accesses       │
+│ /login page         │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Enter username/email│
+│ and password        │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐      YES    ┌─────────────────────┐
+│ System checks if    │────────────→│ Search by email     │
+│ input contains '@'  │             │ in database         │
+└─────────────────────┘             └─────────────────────┘
+  │                                           │
+  │ NO                                        ▼
+  ▼                                  ┌─────────────────────┐
+┌─────────────────────┐              │ User found?         │
+│ Search by username  │              └─────────────────────┘
+│ (name) in database  │                       │
+└─────────────────────┘                       │ YES
+  │                                           ▼
+  ▼                                  ┌─────────────────────┐
+┌─────────────────────┐              │ Check password      │
+│ User found?         │              │ using scrypt hash   │
+└─────────────────────┘              └─────────────────────┘
+  │                                           │
+  │ YES                                       ▼
+  ▼                                  ┌─────────────────────┐
+┌─────────────────────┐              │ Password correct?   │
+│ Check password      │              └─────────────────────┘
+│ using scrypt hash   │                       │
+└─────────────────────┘                       │ YES
+  │                                           ▼
+  │ YES                              ┌─────────────────────┐
+  ▼                                  │ Create session:     │
+┌─────────────────────┐              │ - user_id           │
+│ Password correct?   │              │ - user_name         │
+└─────────────────────┘              │ - user_role         │
+  │                                  └─────────────────────┘
+  │ YES                                       │
+  ▼                                           ▼
+┌─────────────────────┐              ┌─────────────────────┐
+│ Create session:     │              │ Redirect based on   │
+│ - user_id           │              │ user role:          │
+│ - user_name         │              │ - Admin → Admin     │
+│ - user_role         │              │ - Supervisor → Sup  │
+└─────────────────────┘              │ - Employee → Emp    │
+  │                                  │ - Customer → Cust   │
+  ▼                                  └─────────────────────┘
+┌─────────────────────┐                       │
+│ Redirect to role    │                       ▼
+│ specific dashboard  │              ┌─────────────────────┐
+└─────────────────────┘              │ Display flash       │
+  │                                  │ "Welcome back!"     │
+  ▼                                  └─────────────────────┘
+END                                            │
+                                               ▼
+                                              END</div>
+
+                <div class="step-box">
+                    <h4>Step 1: User Access</h4>
+                    <p>User navigates to the login page (<code>/login</code>)</p>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 2: Credential Entry</h4>
+                    <p>User enters either:</p>
+                    <ul>
+                        <li>Username OR Email</li>
+                        <li>Password</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 3: Smart Detection</h4>
+                    <p>System automatically detects input type:</p>
+                    <ul>
+                        <li>If input contains '@' → Search by email</li>
+                        <li>If no '@' → Search by username (name field)</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 4: Password Verification</h4>
+                    <p>System verifies password using scrypt hashing algorithm</p>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 5: Session Creation</h4>
+                    <p>On successful authentication, system creates session with:</p>
+                    <ul>
+                        <li>user_id</li>
+                        <li>user_name</li>
+                        <li>user_role</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Step 6: Role-Based Redirect</h4>
+                    <p>User redirected to appropriate dashboard:</p>
+                    <ul>
+                        <li>Admin → Admin Dashboard</li>
+                        <li>Supervisor → Supervisor Dashboard</li>
+                        <li>Employee → Employee Dashboard</li>
+                        <li>Customer → Customer Dashboard</li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ Security Features:</h4>
+                    <ul>
+                        <li>Password hashing with scrypt algorithm</li>
+                        <li>SQL injection protection via ORM</li>
+                        <li>Session timeout (30 minutes)</li>
+                        <li>Failed login attempt tracking</li>
+                    </ul>
+                </div>
+
+                <h3>Registration Process</h3>
+                <div class="flowchart">START → Enter Details → Validate Password Match → Check Email Exists
+  │                                                         │
+  │                                                         ▼
+  │                                                    Hash Password
+  │                                                         │
+  │                                                         ▼
+  │                                                  Insert to Database
+  │                                                         │
+  └─────────────────────────────────────────────────────────┘
+                                                            │
+                                                            ▼
+                                                    Redirect to Login
+                                                            │
+                                                            ▼
+                                                           END</div>
+            </section>
+
+            <!-- Customer Order Workflow -->
+            <section class="workflow-section" id="order">
+                <div class="workflow-title">
+                    <span class="icon">🛒</span>
+                    <h2>Customer Order Workflow</h2>
+                </div>
+
+                <h3>Complete Order Journey</h3>
+                <div class="flowchart">┌─────────────────────────────────────────────────────────────┐
+│                  CUSTOMER ORDER WORKFLOW                     │
+└─────────────────────────────────────────────────────────────┘
+
+START (Customer Login)
+  │
+  ▼
+┌─────────────────────┐
+│ Browse Menu         │
+│ /menu               │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Filter/Search Items:│
+│ - By Category       │
+│ - By Price          │
+│ - Vegetarian/Spicy  │
+│ - Popular/New       │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Select Item         │
+│ Choose Quantity     │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Add to Cart         │
+│ (Session-based)     │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐      Continue Shopping
+│ Continue Shopping?  │──────────┐
+└─────────────────────┘          │
+  │ No                            │
+  ▼                               │
+┌─────────────────────┐          │
+│ View Cart           │◄─────────┘
+│ /cart               │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Proceed to Checkout │
+│ /checkout           │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Enter/Confirm:      │
+│ - Delivery Address  │
+│ - Phone Number      │
+│ - Special Notes     │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Select Payment      │
+│ Method:             │
+│ - Cash on Delivery  │
+│ - Card              │
+│ - Online            │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Review Order        │
+│ Summary             │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Place Order         │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Create Order in DB  │
+│ Status: Pending     │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Show Confirmation   │
+│ Order ID: #12345    │
+└─────────────────────┘
+  │
+  ▼
+END</div>
+
+                <div class="step-box">
+                    <h4>Phase 1: Menu Browsing</h4>
+                    <ul>
+                        <li>Browse available menu items</li>
+                        <li>Filter by category, price, dietary preferences</li>
+                        <li>View item details, images, descriptions</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Phase 2: Cart Management</h4>
+                    <ul>
+                        <li>Add items to session-based cart</li>
+                        <li>Update quantities</li>
+                        <li>Remove unwanted items</li>
+                        <li>View cart summary and total</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Phase 3: Checkout Process</h4>
+                    <ul>
+                        <li>Enter/confirm delivery address</li>
+                        <li>Provide contact information</li>
+                        <li>Add special instructions (optional)</li>
+                        <li>Select payment method</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Phase 4: Order Confirmation</h4>
+                    <ul>
+                        <li>Review complete order details</li>
+                        <li>Verify total amount</li>
+                        <li>Place order (creates database record)</li>
+                        <li>Receive order confirmation with ID</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>💡 Cart Features:</h4>
+                    <ul>
+                        <li>Session-based (no database until checkout)</li>
+                        <li>Persists during browsing session</li>
+                        <li>Real-time total calculation</li>
+                        <li>Cleared after successful order placement</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Order Processing Workflow -->
+            <section class="workflow-section" id="processing">
+                <div class="workflow-title">
+                    <span class="icon">⚙️</span>
+                    <h2>Order Processing Workflow</h2>
+                </div>
+
+                <h3>Kitchen & Preparation Flow</h3>
+                <div class="flowchart">New Order Created
+  │
+  ▼
+┌─────────────────────┐
+│ Status: PENDING     │
+│ Visible in Kitchen  │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Supervisor Assigns  │
+│ to Employee         │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Employee Receives   │
+│ Assignment          │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Start Preparation   │
+│ Status: PREPARING   │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Food Preparation    │
+│ (Kitchen)           │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Mark as READY       │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Assign Delivery     │
+│ Person              │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Status: OUT FOR     │
+│ DELIVERY            │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Order Delivered     │
+│ Status: COMPLETED   │
+└─────────────────────┘
+  │
+  ▼
+END</div>
+
+                <div class="step-box">
+                    <h4>Order Status Progression:</h4>
+                    <ul>
+                        <li><strong>PENDING</strong> → Order received, awaiting assignment</li>
+                        <li><strong>PREPARING</strong> → Being prepared in kitchen</li>
+                        <li><strong>READY</strong> → Ready for pickup/delivery</li>
+                        <li><strong>OUT FOR DELIVERY</strong> → In transit to customer</li>
+                        <li><strong>COMPLETED</strong> → Successfully delivered</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h4>⚠️ Important Notes:</h4>
+                    <ul>
+                        <li>Each status change is logged with timestamp</li>
+                        <li>Customer receives real-time status updates</li>
+                        <li>Supervisor can reassign orders if needed</li>
+                        <li>Completed orders trigger feedback request</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Employee Assignment Workflow -->
+            <section class="workflow-section" id="employee">
+                <div class="workflow-title">
+                    <span class="icon">👥</span>
+                    <h2>Employee Assignment Workflow</h2>
+                </div>
+
+                <div class="flowchart">START (Supervisor/Admin)
+  │
+  ▼
+┌─────────────────────┐
+│ View All Pending    │
+│ Orders              │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Select Order to     │
+│ Assign              │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ View Available      │
+│ Employees           │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Select Employee     │
+│ based on workload   │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Assign Order        │
+│ Update Database     │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Notify Employee     │
+│ via Dashboard       │
+└─────────────────────┘
+  │
+  ▼
+END</div>
+
+                <div class="step-box">
+                    <h4>Assignment Criteria:</h4>
+                    <ul>
+                        <li>Employee availability</li>
+                        <li>Current workload (number of active orders)</li>
+                        <li>Employee specialization (kitchen/delivery)</li>
+                        <li>Location (for delivery assignments)</li>
+                        <li>Performance rating</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>📊 Workload Distribution:</h4>
+                    <p>The system displays each employee's current workload to help supervisors make informed assignment decisions and ensure balanced distribution of tasks.</p>
+                </div>
+            </section>
+
+            <!-- Payment Processing Workflow -->
+            <section class="workflow-section" id="payment">
+                <div class="workflow-title">
+                    <span class="icon">💳</span>
+                    <h2>Payment Processing Workflow</h2>
+                </div>
+
+                <div class="flowchart">Order Placed
+  │
+  ▼
+┌─────────────────────┐
+│ Payment Status:     │
+│ PENDING             │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐      Cash on Delivery
+│ Payment Method?     │──────────────────┐
+└─────────────────────┘                  │
+  │                                      │
+  │ Online/Card                          │
+  ▼                                      ▼
+┌─────────────────────┐        ┌─────────────────────┐
+│ Redirect to Payment │        │ Mark for COD        │
+│ Gateway             │        │ Processing          │
+└─────────────────────┘        └─────────────────────┘
+  │                                      │
+  ▼                                      ▼
+┌─────────────────────┐        ┌─────────────────────┐
+│ Process Payment     │        │ Payment Collected   │
+│                     │        │ on Delivery         │
+└─────────────────────┘        └─────────────────────┘
+  │                                      │
+  ▼                                      │
+┌─────────────────────┐                 │
+│ Create Payment      │                 │
+│ Record in DB        │                 │
+└─────────────────────┘                 │
+  │                                      │
+  ▼                                      │
+┌─────────────────────┐                 │
+│ Update Order:       │                 │
+│ payment_status:PAID │◄────────────────┘
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Generate Receipt    │
+└─────────────────────┘
+  │
+  ▼
+END</div>
+
+                <div class="step-box">
+                    <h4>Payment Methods Supported:</h4>
+                    <ul>
+                        <li><strong>Cash on Delivery (COD)</strong> - Pay when order arrives</li>
+                        <li><strong>Credit/Debit Card</strong> - Secure card processing</li>
+                        <li><strong>Online Payment</strong> - UPI, wallets, net banking</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Payment Record Includes:</h4>
+                    <ul>
+                        <li>Transaction ID (for online payments)</li>
+                        <li>Amount paid</li>
+                        <li>Payment method</li>
+                        <li>Payment status</li>
+                        <li>Timestamp</li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ Payment Security:</h4>
+                    <ul>
+                        <li>Secure payment gateway integration</li>
+                        <li>PCI DSS compliant processing</li>
+                        <li>Encrypted transaction data</li>
+                        <li>Automatic receipt generation</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Delivery Management Workflow -->
+            <section class="workflow-section" id="delivery">
+                <div class="workflow-title">
+                    <span class="icon">🚚</span>
+                    <h2>Delivery Management Workflow</h2>
+                </div>
+
+                <div class="flowchart">Order Ready for Delivery
+  │
+  ▼
+┌─────────────────────┐
+│ Create Delivery     │
+│ Record in DB        │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Supervisor Assigns  │
+│ Delivery Person     │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Delivery Person     │
+│ Receives Details    │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Mark as:            │
+│ IN TRANSIT          │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Navigate to         │
+│ Customer Location   │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐      Successful
+│ Delivery Attempt    │──────────────┐
+└─────────────────────┘              │
+  │ Failed                           ▼
+  ▼                          ┌─────────────────────┐
+┌─────────────────────┐      │ Hand over Order     │
+│ Mark as FAILED      │      │ Collect Payment COD │
+│ Notify Supervisor   │      └─────────────────────┘
+└─────────────────────┘                │
+  │                                    ▼
+  ▼                          ┌─────────────────────┐
+┌─────────────────────┐      │ Confirm Delivery    │
+│ Reschedule or       │      │ Update Status       │
+│ Refund Process      │      └─────────────────────┘
+└─────────────────────┘                │
+  │                                    ▼
+  ▼                          ┌─────────────────────┐
+END                          │ Send Feedback       │
+                             │ Request             │
+                             └─────────────────────┘
+                                       │
+                                       ▼
+                                      END</div>
+
+                <div class="step-box">
+                    <h4>Delivery Information Provided:</h4>
+                    <ul>
+                        <li>Customer name and phone number</li>
+                        <li>Complete delivery address</li>
+                        <li>Order details and items</li>
+                        <li>Special delivery instructions</li>
+                        <li>Payment method (COD or prepaid)</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Delivery Status Tracking:</h4>
+                    <ul>
+                        <li><strong>PENDING</strong> → Awaiting assignment</li>
+                        <li><strong>ASSIGNED</strong> → Delivery person assigned</li>
+                        <li><strong>IN TRANSIT</strong> → On the way to customer</li>
+                        <li><strong>DELIVERED</strong> → Successfully delivered</li>
+                        <li><strong>FAILED</strong> → Delivery unsuccessful</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>📍 Real-time Tracking:</h4>
+                    <p>Customers can track their order status in real-time through the dashboard. The system updates automatically as the delivery progresses through each stage.</p>
+                </div>
+            </section>
+
+            <!-- Feedback Collection Workflow -->
+            <section class="workflow-section" id="feedback">
+                <div class="workflow-title">
+                    <span class="icon">⭐</span>
+                    <h2>Feedback Collection Workflow</h2>
+                </div>
+
+                <div class="flowchart">Order Completed
+  │
+  ▼
+┌─────────────────────┐
+│ Send Feedback       │
+│ Request to Customer │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Customer Opens      │
+│ Feedback Form       │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Select Rating:      │
+│ ⭐⭐⭐⭐⭐ (1-5)      │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Write Comment       │
+│ (Optional)          │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Submit Feedback     │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Save to Database    │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Update Analytics    │
+│ - Avg Rating        │
+│ - Satisfaction Rate │
+└─────────────────────┘
+  │
+  ▼
+┌─────────────────────┐
+│ Notify Management   │
+│ (if rating < 3)     │
+└─────────────────────┘
+  │
+  ▼
+END</div>
+
+                <div class="step-box">
+                    <h4>Feedback Components:</h4>
+                    <ul>
+                        <li><strong>Rating</strong> - 1 to 5 stars (required)</li>
+                        <li><strong>Comment</strong> - Text feedback (optional)</li>
+                        <li><strong>Order Reference</strong> - Linked to specific order</li>
+                        <li><strong>Timestamp</strong> - When feedback was submitted</li>
+                    </ul>
+                </div>
+
+                <div class="step-box">
+                    <h4>Analytics Updated:</h4>
+                    <ul>
+                        <li>Average rating calculation</li>
+                        <li>Customer satisfaction rate</li>
+                        <li>Individual menu item ratings</li>
+                        <li>Employee performance metrics</li>
+                        <li>Trend analysis over time</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h4>⚠️ Low Rating Alert:</h4>
+                    <p>When a customer submits a rating below 3 stars, management is automatically notified to address potential issues and improve service quality.</p>
+                </div>
+            </section>
+
+            <!-- Admin Management Workflow -->
+            <section class="workflow-section" id="admin">
+                <div class="workflow-title">
+                    <span class="icon">👨‍💼</span>
+                    <h2>Admin Management Workflow</h2>
+                </div>
+
+                <h3>User Management</h3>
+                <div class="flowchart">Admin Login → View Users → Select Action
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+    Add User            Edit User             Delete User
+        │                     │                     │
+        ▼                     ▼                     ▼
+    Enter Details       Update Info           Confirm Delete
+        │                     │                     │
+        ▼                     ▼                     ▼
+    Save to DB         Save Changes          Remove from DB
+        │                     │                     │
+        └─────────────────────┴─────────────────────┘
+                              │
+                              ▼
+                         Success Message
+                              │
+                              ▼
+                             END</div>
+
+                <h3>Menu Management</h3>
+                <div class="flowchart">Admin Login → View Menu → Select Action
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+    Add Item            Edit Item             Delete Item
+        │                     │                     │
+        ▼                     ▼                     ▼
+    Enter Details       Update Info          Confirm Delete
+    Upload Image        Change Price          
+        │                     │                     │
+        ▼                     ▼                     ▼
+    Save to DB         Save Changes          Soft Delete
+        │                     │             (availability=FALSE)
+        └─────────────────────┴─────────────────────┘
+                              │
+                              ▼
+                         Success Message
+                              │
+                              ▼
+                             END</div>
+
+                <div class="step-box">
+                    <h4>Admin Capabilities:</h4>
+                    <ul>
+                        <li><strong>User Management</strong> - Create, edit, delete users of all roles</li>
+                        <li><strong>Menu Management</strong> - Full control over menu items</li>
+                        <li><strong>Order Management</strong> - View and manage all orders</li>
+                        <li><strong>Payment Management</strong> - Monitor all transactions</li>
+                        <li><strong>Reports & Analytics</strong> - Access comprehensive reports</li>
+                        <li><strong>System Settings</strong> - Configure system parameters</li>
+                    </ul>
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ Admin Features:</h4>
+                    <ul>
+                        <li>Complete system oversight</li>
+                        <li>Real-time dashboard with key metrics</li>
+                        <li>Advanced filtering and search capabilities</li>
+                        <li>Bulk operations support</li>
+                        <li>Export functionality for reports</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Smart Food Ordering System - Workflow Documentation</p>
+            <p>Generated: October 18, 2025</p>
+        </footer>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">🖨️ Print Documentation</button>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const workflowSections = document.querySelectorAll('.workflow-section');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+                
+                // Remove active class from all buttons and sections
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                workflowSections.forEach(section => section.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding section
+                button.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+                
+                // Scroll to top of content
+                document.querySelector('.content').scrollTop = 0;
+            });
+        });
+
+        // Table of contents links
+        const tocLinks = document.querySelectorAll('.toc a[data-tab]');
+        tocLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetTab = link.getAttribute('data-tab');
+                const targetButton = document.querySelector(`button[data-tab="${targetTab}"]`);
+                if (targetButton) {
+                    targetButton.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

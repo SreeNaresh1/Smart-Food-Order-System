@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Details - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-credit-card text-primary"></i>
+            Payment Details
+        </h2>
+        <div>
+            <a href="{{ url_for('payments.list_payments') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+            <a href="{{ url_for('payments.download_receipt', payment_id=payment.payment_id) }}" class="btn btn-success" target="_blank">
+                <i class="fas fa-print"></i> Print Receipt
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Payment Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Payment Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Payment ID:</strong>
+                            <p class="mb-0">#{{ payment.payment_id }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Transaction ID:</strong>
+                            <p class="mb-0">
+                                {% if payment.transaction_id %}
+                                    <code>{{ payment.transaction_id }}</code>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Amount:</strong>
+                            <p class="mb-0"><h4 class="text-success">${{ "%.2f"|format(payment.amount) }}</h4></p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Payment Method:</strong>
+                            <p class="mb-0">
+                                <span class="badge 
+                                    {% if payment.payment_method == 'Credit Card' %}bg-primary
+                                    {% elif payment.payment_method == 'Debit Card' %}bg-info
+                                    {% elif payment.payment_method == 'Cash' %}bg-success
+                                    {% elif payment.payment_method == 'Digital Wallet' or payment.payment_method == 'UPI' %}bg-warning
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ payment.payment_method }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Status:</strong>
+                            <p class="mb-0">
+                                <span class="badge 
+                                    {% if payment.status == 'completed' or payment.status == 'Completed' %}bg-success
+                                    {% elif payment.status == 'pending' or payment.status == 'Pending' %}bg-warning
+                                    {% elif payment.status == 'failed' or payment.status == 'Failed' %}bg-danger
+                                    {% elif payment.status == 'refunded' or payment.status == 'Refunded' %}bg-info
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ payment.status.title() if payment.status else 'Pending' }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Payment Date:</strong>
+                            <p class="mb-0">
+                                {% if payment.payment_date %}
+                                    {{ payment.payment_date.strftime('%B %d, %Y at %H:%M:%S') }}
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shopping-cart"></i>
+                        Order Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if order %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Order ID:</strong>
+                            <p class="mb-0">#{{ order.order_id }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Order Date:</strong>
+                            <p class="mb-0">
+                                {% if order.order_date %}
+                                    {{ order.order_date.strftime('%B %d, %Y at %H:%M') }}
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Order Status:</strong>
+                            <p class="mb-0">
+                                <span class="badge bg-primary">{{ order.status }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Total Amount:</strong>
+                            <p class="mb-0"><strong>${{ "%.2f"|format(order.total_amount) }}</strong></p>
+                        </div>
+                    </div>
+                    {% if order.order_details %}
+                    <div class="row">
+                        <div class="col-12">
+                            <strong>Order Items:</strong>
+                            <table class="table table-sm mt-2">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for detail in order.order_details %}
+                                    <tr>
+                                        <td>{{ detail.menu.food_name if detail.menu else 'Unknown' }}</td>
+                                        <td>{{ detail.quantity }}</td>
+                                        <td>${{ "%.2f"|format(detail.unit_price) }}</td>
+                                        <td>${{ "%.2f"|format(detail.sub_total) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-muted">No order information available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Customer Information -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user"></i>
+                        Customer Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if order and order.customer %}
+                    <p><strong>Name:</strong><br>{{ order.customer.name }}</p>
+                    <p><strong>Email:</strong><br>{{ order.customer.email }}</p>
+                    <p><strong>Phone:</strong><br>{{ order.customer.phone if order.customer.phone else 'N/A' }}</p>
+                    {% else %}
+                    <p class="text-muted">No customer information available.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Payment Timeline -->
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history"></i>
+                        Payment Timeline
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% if payment.payment_date %}
+                        <div class="timeline-item mb-3">
+                            <i class="fas fa-circle text-primary"></i>
+                            <div class="ms-3">
+                                <strong>Payment Created</strong>
+                                <br><small class="text-muted">{{ payment.payment_date.strftime('%B %d, %Y %H:%M') }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if payment.status == 'completed' or payment.status == 'Completed' %}
+                        <div class="timeline-item mb-3">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <div class="ms-3">
+                                <strong>Payment Completed</strong>
+                                <br><small class="text-muted">{{ payment.payment_date.strftime('%B %d, %Y %H:%M') if payment.payment_date else 'N/A' }}</small>
+                            </div>
+                        </div>
+                        {% elif payment.status == 'failed' or payment.status == 'Failed' %}
+                        <div class="timeline-item mb-3">
+                            <i class="fas fa-times-circle text-danger"></i>
+                            <div class="ms-3">
+                                <strong>Payment Failed</strong>
+                                <br><small class="text-muted">{{ payment.payment_date.strftime('%B %d, %Y %H:%M') if payment.payment_date else 'N/A' }}</small>
+                            </div>
+                        </div>
+                        {% elif payment.status == 'refunded' or payment.status == 'Refunded' %}
+                        <div class="timeline-item mb-3">
+                            <i class="fas fa-undo text-info"></i>
+                            <div class="ms-3">
+                                <strong>Payment Refunded</strong>
+                                <br><small class="text-muted">{{ payment.payment_date.strftime('%B %d, %Y %H:%M') if payment.payment_date else 'N/A' }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+}
+
+.timeline-item i {
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+
+code {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+</style>
+{% endblock %}

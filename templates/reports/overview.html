@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}Overview Report - Food Order System{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-chart-bar text-dark"></i>
+            System Overview Report
+        </h2>
+        <div>
+            <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Reports
+            </a>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                Print Report
+            </button>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Overview Report</strong> - Complete system performance overview and key performance indicators.
+    </div>
+
+    <!-- Key Performance Indicators -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Total Orders</h6>
+                            <h3 class="mb-0">{{ stats.total_orders }}</h3>
+                            <small>{{ stats.recent_orders }} in last 7 days</small>
+                        </div>
+                        <i class="fas fa-shopping-cart fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Total Revenue</h6>
+                            <h3 class="mb-0">{{ "%.2f"|format(stats.total_revenue) }}</h3>
+                            <small>{{ "%.2f"|format(stats.recent_revenue) }} in last 7 days</small>
+                        </div>
+                        <i class="fas fa-dollar-sign fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Total Customers</h6>
+                            <h3 class="mb-0">{{ stats.total_customers }}</h3>
+                            <small>{{ stats.recent_customers }} new in last 7 days</small>
+                        </div>
+                        <i class="fas fa-users fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Avg Rating</h6>
+                            <h3 class="mb-0">{{ stats.avg_rating }} <i class="fas fa-star"></i></h3>
+                            <small>From {{ stats.total_feedback }} reviews</small>
+                        </div>
+                        <i class="fas fa-star fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Modules Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Users & Staff</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Total Users</span>
+                        <span class="badge bg-primary fs-6">{{ stats.total_users }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Customers</span>
+                        <span class="badge bg-info fs-6">{{ stats.total_customers }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Staff Members</span>
+                        <span class="badge bg-secondary fs-6">{{ stats.total_staff }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-utensils"></i> Menu Items</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Total Items</span>
+                        <span class="badge bg-primary fs-6">{{ stats.total_menu_items }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Active Items</span>
+                        <span class="badge bg-success fs-6">{{ stats.active_menu_items }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Inactive Items</span>
+                        <span class="badge bg-secondary fs-6">{{ stats.total_menu_items - stats.active_menu_items }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-truck"></i> Deliveries</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Total Deliveries</span>
+                        <span class="badge bg-primary fs-6">{{ stats.total_deliveries }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Completed</span>
+                        <span class="badge bg-success fs-6">{{ stats.completed_deliveries }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Success Rate</span>
+                        <span class="badge bg-info fs-6">
+                            {% if stats.total_deliveries > 0 %}
+                            {{ "%.1f"|format(stats.completed_deliveries / stats.total_deliveries * 100) }}%
+                            {% else %}
+                            0%
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Order Status Breakdown -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Order Status Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats.order_status_breakdown %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for status, count in stats.order_status_breakdown.items() %}
+                                <tr>
+                                    <td>
+                                        {% if status == 'Delivered' or status == 'Completed' %}
+                                        <span class="badge bg-success">{{ status }}</span>
+                                        {% elif status == 'Pending' %}
+                                        <span class="badge bg-warning">{{ status }}</span>
+                                        {% elif status == 'Cancelled' %}
+                                        <span class="badge bg-danger">{{ status }}</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>{{ count }}</strong></td>
+                                    <td>
+                                        {% if stats.total_orders > 0 %}
+                                        {{ "%.1f"|format(count / stats.total_orders * 100) }}%
+                                        {% else %}
+                                        0%
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No order data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-credit-card"></i> Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats.payment_method_breakdown %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Count</th>
+                                    <th>Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for method, count, amount in stats.payment_method_breakdown %}
+                                <tr>
+                                    <td>
+                                        {% if method == 'Cash' %}
+                                        <span class="badge bg-secondary">{{ method }}</span>
+                                        {% elif method == 'Credit Card' or method == 'Debit Card' %}
+                                        <span class="badge bg-primary">{{ method }}</span>
+                                        {% else %}
+                                        <span class="badge bg-info">{{ method }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>{{ count }}</strong></td>
+                                    <td><strong>{{ "%.2f"|format(amount if amount else 0) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No payment data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Categories & System Health -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-trophy"></i> Top Categories by Revenue</h5>
+                </div>
+                <div class="card-body">
+                    {% if stats.top_categories %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Category</th>
+                                    <th>Items Sold</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in stats.top_categories %}
+                                <tr>
+                                    <td><strong>#{{ loop.index }}</strong></td>
+                                    <td><span class="badge bg-warning">{{ category.category }}</span></td>
+                                    <td>{{ category.items_sold }}</td>
+                                    <td><strong>{{ "%.2f"|format(category.revenue) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No category data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-heartbeat"></i> System Health</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-clock"></i> Pending Orders</span>
+                            <span class="badge bg-warning fs-6">{{ stats.pending_orders }}</span>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-shipping-fast"></i> In Transit Deliveries</span>
+                            <span class="badge bg-info fs-6">{{ stats.in_transit_deliveries }}</span>
+                        </div>
+                    </div>
+                    <div class="alert alert-secondary mb-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-credit-card"></i> Pending Payments</span>
+                            <span class="badge bg-secondary fs-6">{{ stats.pending_payments }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-money-check-alt"></i> Payment Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center p-3">
+                                <h6 class="text-muted">Total Payments</h6>
+                                <h3 class="text-primary">{{ stats.total_payments }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3">
+                                <h6 class="text-muted">Completed Payments</h6>
+                                <h3 class="text-success">{{ stats.completed_payments }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center p-3">
+                                <h6 class="text-muted">Success Rate</h6>
+                                <h3 class="text-info">
+                                    {% if stats.total_payments > 0 %}
+                                    {{ "%.1f"|format(stats.completed_payments / stats.total_payments * 100) }}%
+                                    {% else %}
+                                    0%
+                                    {% endif %}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
