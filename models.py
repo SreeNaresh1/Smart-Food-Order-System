@@ -16,10 +16,21 @@ class User(db.Model):
     address = db.Column(db.Text, nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.now)
     
+    # Two-Factor Authentication fields
+    two_factor_enabled = db.Column(db.Boolean, default=False)
+    otp_code = db.Column(db.String(6), nullable=True)
+    otp_expiry = db.Column(db.DateTime, nullable=True)
+    backup_codes = db.Column(db.Text, nullable=True)  # Comma-separated encrypted codes
+    failed_login_attempts = db.Column(db.Integer, default=0)
+    account_locked_until = db.Column(db.DateTime, nullable=True)
+    last_login = db.Column(db.DateTime, nullable=True)
+    
     # Relationships
     orders = db.relationship('Order', backref='customer', lazy=True, cascade='all, delete-orphan')
     feedback = db.relationship('Feedback', backref='user', lazy=True, cascade='all, delete-orphan')
     recommendations = db.relationship('Recommendation', backref='user', lazy=True, cascade='all, delete-orphan')
+    login_history = db.relationship('LoginHistory', backref='user', lazy=True, cascade='all, delete-orphan')
+    trusted_devices = db.relationship('TrustedDevice', backref='user', lazy=True, cascade='all, delete-orphan')
     
     # Role checking helper methods
     def has_role(self, *roles):
@@ -212,3 +223,38 @@ class Recommendation(db.Model):
     
     def __repr__(self):
         return f'<Recommendation {self.recommendation_id}>'
+
+class LoginHistory(db.Model):
+    """Track all login attempts for security monitoring"""
+    __tablename__ = 'login_history'
+    
+    history_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    login_time = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    ip_address = db.Column(db.String(45), nullable=True)  # Supports IPv4 and IPv6
+    user_agent = db.Column(db.String(255), nullable=True)  # Browser info
+    location = db.Column(db.String(100), nullable=True)  # City/Country
+    login_method = db.Column(db.String(50), nullable=False)  # password, otp, backup_code
+    status = db.Column(db.String(20), nullable=False)  # success, failed, locked
+    failure_reason = db.Column(db.String(100), nullable=True)  # wrong_password, wrong_otp, account_locked
+    device_fingerprint = db.Column(db.String(255), nullable=True)  # Unique device identifier
+    
+    def __repr__(self):
+        return f'<LoginHistory {self.history_id} - {self.status}>'
+
+class TrustedDevice(db.Model):
+    """Store trusted devices to skip 2FA"""
+    __tablename__ = 'trusted_device'
+    
+    device_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    device_fingerprint = db.Column(db.String(255), unique=True, nullable=False)
+    device_name = db.Column(db.String(100), nullable=True)  # e.g., "Chrome on Windows"
+    trusted_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    last_used = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)  # Trust expires after 30 days
+    ip_address = db.Column(db.String(45), nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
+    
+    def __repr__(self):
+        return f'<TrustedDevice {self.device_name}>'

@@ -36,6 +36,7 @@ This is a 3-tier architecture application featuring:
 
 ### 🔐 Security Features
 - **Password Hashing**: Werkzeug security for secure authentication
+- **Two-Factor Authentication (2FA)**: Email-based OTP verification with backup codes
 - **Session Management**: Secure user sessions
 - **Role-Based Access**: Granular permission control
 - **SQL Injection Prevention**: Parameterized queries
@@ -80,12 +81,17 @@ This is a 3-tier architecture application featuring:
    pip install -r requirements.txt
    ```
 
-2. **Create sample data** (optional):
+2. **Configure email for 2FA** (optional but recommended):
+   - See `EMAIL_SETUP_GUIDE.md` for detailed instructions
+   - Set environment variables or edit `app.py` with your email credentials
+   - Test configuration: `python test_email_config.py`
+
+3. **Create sample data** (optional):
    ```bash
    python create_sample_data.py
    ```
 
-3. **Start the application**:
+4. **Start the application**:
    ```bash
    python app.py
    ```
@@ -263,15 +269,22 @@ For technical support or questions about the implementation:
 - Check the Flask and SQLAlchemy documentation
 - Examine the sample data and test scenarios
 
+## 📚 Additional Documentation
+
+- **[TWO_FACTOR_AUTH_GUIDE.md](TWO_FACTOR_AUTH_GUIDE.md)** - Complete guide to Two-Factor Authentication setup and usage
+- **[EMAIL_SETUP_GUIDE.md](EMAIL_SETUP_GUIDE.md)** - Quick email configuration for 2FA (Gmail, Outlook, etc.)
+- **DOCUMENTATION/** - Comprehensive technical and user documentation
+
 ## 🏆 Key Achievements
 
-✅ **Complete CRUD Operations** for all 9 database tables
-✅ **Role-Based Security** with proper access controls
-✅ **AI-Powered Recommendations** with content-based filtering
-✅ **Comprehensive Reporting** with SQL joins and aggregations
-✅ **Responsive Design** with modern UI/UX
-✅ **Scalable Architecture** with modular blueprints
-✅ **Performance Optimized** for 500+ records
+✅ **Complete CRUD Operations** for all 9 database tables  
+✅ **Role-Based Security** with proper access controls  
+✅ **Two-Factor Authentication** with email OTP and backup codes  
+✅ **AI-Powered Recommendations** with content-based filtering  
+✅ **Comprehensive Reporting** with SQL joins and aggregations  
+✅ **Responsive Design** with modern UI/UX  
+✅ **Scalable Architecture** with modular blueprints  
+✅ **Performance Optimized** for 500+ records  
 ✅ **Production-Ready** with proper error handling
 
 ---

@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+
+{% block title %}2FA Security Dashboard - Admin{% endblock %}
+
+{% block content %}
+<style>
+    .security-dashboard {
+        padding: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .dashboard-header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+    
+    .stat-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    
+    .stat-trend {
+        margin-top: 10px;
+        font-size: 0.85rem;
+    }
+    
+    .trend-up { color: #10b981; }
+    .trend-down { color: #ef4444; }
+    
+    .section-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .history-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+    
+    .history-table th {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .history-table th:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+    
+    .history-table th:last-child {
+        border-radius: 0 10px 10px 0;
+    }
+    
+    .history-table td {
+        background: #f8f9fa;
+        padding: 15px;
+        border-top: 1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .history-table td:first-child {
+        border-left: 1px solid #e9ecef;
+        border-radius: 10px 0 0 10px;
+    }
+    
+    .history-table td:last-child {
+        border-right: 1px solid #e9ecef;
+        border-radius: 0 10px 10px 0;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .device-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .device-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .device-details {
+        flex: 1;
+    }
+    
+    .device-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1rem;
+    }
+    
+    .device-meta {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-top: 20px;
+    }
+    
+    .filter-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 10px 20px;
+        border: 2px solid #667eea;
+        background: white;
+        color: #667eea;
+        border-radius: 25px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .filter-btn:hover,
+    .filter-btn.active {
+        background: #667eea;
+        color: white;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+        font-style: italic;
+    }
+</style>
+
+<div class="security-dashboard">
+    <div class="dashboard-header">
+        <h1>🔐 2FA Security Dashboard</h1>
+        <p>Monitor two-factor authentication and security metrics</p>
+    </div>
+    
+    <!-- Statistics Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value">{{ stats.total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">🔒</div>
+            <div class="stat-value">{{ stats.users_with_2fa }}</div>
+            <div class="stat-label">Users with 2FA</div>
+            <div class="stat-trend trend-up">
+                📈 {{ stats['2fa_adoption_rate'] }}% adoption rate
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">🚀</div>
+            <div class="stat-value">{{ stats.recent_logins_24h }}</div>
+            <div class="stat-label">Logins (24h)</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-value">{{ stats.recent_failed_24h }}</div>
+            <div class="stat-label">Failed Attempts (24h)</div>
+            {% if stats.recent_failed_24h > 0 %}
+            <div class="stat-trend trend-down">
+                ⚠️ Monitor security
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">📱</div>
+            <div class="stat-value">{{ stats.active_trusted_devices }}</div>
+            <div class="stat-label">Trusted Devices</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">🔐</div>
+            <div class="stat-value">{{ stats.locked_accounts_24h }}</div>
+            <div class="stat-label">Locked Accounts (24h)</div>
+        </div>
+    </div>
+    
+    <!-- Recent Login Activity -->
+    <div class="section-card">
+        <div class="section-title">
+            📊 Recent Login Activity
+        </div>
+        
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterLogins('all')">All</button>
+            <button class="filter-btn" onclick="filterLogins('success')">Success</button>
+            <button class="filter-btn" onclick="filterLogins('failed')">Failed</button>
+            <button class="filter-btn" onclick="filterLogins('locked')">Locked</button>
+        </div>
+        
+        {% if recent_logins %}
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Time</th>
+                    <th>IP Address</th>
+                    <th>Device</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="loginTableBody">
+                {% for login in recent_logins %}
+                <tr data-status="{{ login.status }}">
+                    <td><strong>{{ login.user.name }}</strong><br><small>{{ login.user.email }}</small></td>
+                    <td>{{ login.login_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ login.ip_address or 'N/A' }}</td>
+                    <td><small>{{ login.user_agent[:50] }}...</small></td>
+                    <td>{{ login.login_method }}</td>
+                    <td>
+                        {% if login.status == 'success' %}
+                        <span class="status-badge badge-success">✓ Success</span>
+                        {% elif login.status == 'failed' %}
+                        <span class="status-badge badge-danger">✗ Failed</span>
+                        {% else %}
+                        <span class="status-badge badge-warning">🔒 Locked</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-data">
+            No login activity recorded yet
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- User 2FA Status -->
+    <div class="section-card">
+        <div class="section-title">
+            👥 User 2FA Status
+        </div>
+        
+        {% if users %}
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>2FA Status</th>
+                    <th>Last Login</th>
+                    <th>Failed Attempts</th>
+                    <th>Account Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><strong>{{ user.name }}</strong><br><small>{{ user.email }}</small></td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                        {% if user.two_factor_enabled %}
+                        <span class="status-badge badge-success">✓ Enabled</span>
+                        {% else %}
+                        <span class="status-badge badge-warning">⚠️ Disabled</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
+                    <td>{{ user.failed_login_attempts }}</td>
+                    <td>
+                        {% if user.account_locked_until and user.account_locked_until > now %}
+                        <span class="status-badge badge-danger">🔒 Locked</span>
+                        {% else %}
+                        <span class="status-badge badge-success">✓ Active</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-data">
+            No users found
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function filterLogins(status) {
+    const rows = document.querySelectorAll('#loginTableBody tr');
+    const buttons = document.querySelectorAll('.filter-btn');
+    
+    // Update button states
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Filter rows
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import os
@@ -13,6 +14,17 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Flask-Mail Configuration (Gmail)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'astrostarnaresh@gmail.com'
+app.config['MAIL_PASSWORD'] = 'fjjytitmbavpfzkh'
+app.config['MAIL_DEFAULT_SENDER'] = 'astrostarnaresh@gmail.com'
+
+# Initialize extensions
+mail = Mail(app)
 
 # Import models first
 from models import db, User, Order, OrderDetails, MenuItem, Payment, Feedback, Delivery, KitchenStaff, Recommendation
@@ -31,6 +43,7 @@ from routes.delivery import delivery_bp
 from routes.kitchen import kitchen_bp
 from routes.recommendations import recommendations_bp
 from routes.reports import reports_bp
+from routes.admin_security import admin_security_bp
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -43,6 +56,13 @@ app.register_blueprint(delivery_bp, url_prefix='/delivery')
 app.register_blueprint(kitchen_bp, url_prefix='/kitchen')
 app.register_blueprint(recommendations_bp, url_prefix='/recommendations')
 app.register_blueprint(reports_bp, url_prefix='/reports')
+app.register_blueprint(admin_security_bp)
+
+# Test route for 2FA modal
+@app.route('/test-modal')
+def test_modal():
+    """Test page for 2FA modal input functionality"""
+    return render_template('test_modal.html')
 
 # Disable caching for development (helps with seeing CSS/JS changes immediately)
 @app.after_request

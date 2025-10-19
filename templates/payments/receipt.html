@@ -116,8 +116,8 @@
                     <tr>
                         <td>{{ detail.menu.food_name if detail.menu else 'Unknown' }}</td>
                         <td class="text-center">{{ detail.quantity }}</td>
-                        <td class="text-end">${{ "%.2f"|format(detail.unit_price) }}</td>
-                        <td class="text-end">${{ "%.2f"|format(detail.sub_total) }}</td>
+                        <td class="text-end">₹{{ "%.2f"|format(detail.unit_price) }}</td>
+                        <td class="text-end">₹{{ "%.2f"|format(detail.sub_total) }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -131,7 +131,7 @@
                     <p class="mb-0">TOTAL AMOUNT:</p>
                 </div>
                 <div class="col-6 text-end">
-                    <p class="mb-0 text-success">${{ "%.2f"|format(payment.amount) }}</p>
+                    <p class="mb-0 text-success">₹{{ "%.2f"|format(payment.amount) }}</p>
                 </div>
             </div>
         </div>

@@ -140,6 +140,12 @@
                                 Date: {{ order.payment.payment_date.strftime('%Y-%m-%d %H:%M') }}
                             </small>
                         </div>
+                        <div class="mt-3">
+                            <a href="{{ url_for('payments.download_receipt', payment_id=order.payment.payment_id) }}" 
+                               class="btn btn-outline-primary btn-sm" target="_blank">
+                                <i class="fas fa-print"></i> Print Receipt
+                            </a>
+                        </div>
                         {% else %}
                         <span class="badge bg-warning fs-6">
                             <i class="fas fa-clock"></i> Payment Pending
@@ -177,6 +183,12 @@
 
                     <!-- Customer Actions -->
                     {% if session.user_role == 'customer' %}
+                        {% if order.payment %}
+                        <a href="{{ url_for('payments.download_receipt', payment_id=order.payment.payment_id) }}" 
+                           class="btn btn-primary w-100 mb-2" target="_blank">
+                            <i class="fas fa-print"></i> Print Receipt
+                        </a>
+                        {% endif %}
                         {% if order.status == 'Delivered' %}
                         <a href="{{ url_for('feedback.create_feedback', order_id=order.order_id) }}" class="btn btn-success w-100 mb-2">
                             <i class="fas fa-star"></i> Rate & Review

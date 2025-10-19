@@ -58,6 +58,57 @@
                             
                             <hr class="my-4">
                             
+                            <!-- Two-Factor Authentication Section -->
+                            <h5 class="mb-3">
+                                <i class="fas fa-shield-alt"></i> Two-Factor Authentication (2FA)
+                            </h5>
+                            
+                            <div class="alert {% if user.two_factor_enabled %}alert-success{% else %}alert-warning{% endif %} mb-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <strong>
+                                            {% if user.two_factor_enabled %}
+                                                <i class="fas fa-check-circle"></i> 2FA is Enabled
+                                            {% else %}
+                                                <i class="fas fa-exclamation-triangle"></i> 2FA is Disabled
+                                            {% endif %}
+                                        </strong>
+                                        <br>
+                                        <small>
+                                            {% if user.two_factor_enabled %}
+                                                Your account is protected with two-factor authentication
+                                            {% else %}
+                                                Enable 2FA for enhanced security
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn {% if user.two_factor_enabled %}btn-danger{% else %}btn-success{% endif %} btn-sm" 
+                                                data-bs-toggle="modal" data-bs-target="#toggle2FAModal">
+                                            {% if user.two_factor_enabled %}
+                                                <i class="fas fa-times-circle"></i> Disable
+                                            {% else %}
+                                                <i class="fas fa-shield-alt"></i> Enable
+                                            {% endif %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if user.two_factor_enabled %}
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm me-2" 
+                                        data-bs-toggle="modal" data-bs-target="#backupCodesModal">
+                                    <i class="fas fa-key"></i> View/Regenerate Backup Codes
+                                </button>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i> Backup codes allow you to login if you lose access to your email
+                                </small>
+                            </div>
+                            {% endif %}
+                            
+                            <hr class="my-4">
+                            
                             <h5 class="mb-3"><i class="fas fa-key"></i> Change Password (Optional)</h5>
                             
                             <div class="mb-3">
@@ -95,6 +146,446 @@
     </div>
 </div>
 
+<!-- Toggle 2FA Modal -->
+<div class="modal fade" id="toggle2FAModal" tabindex="-1" aria-labelledby="toggle2FAModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="toggle2FAModalLabel">
+                    {% if user.two_factor_enabled %}
+                        <i class="fas fa-times-circle text-danger"></i> Disable Two-Factor Authentication
+                    {% else %}
+                        <i class="fas fa-shield-alt text-success"></i> Enable Two-Factor Authentication
+                    {% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if user.two_factor_enabled %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> Disabling 2FA will make your account less secure.
+                    </div>
+                    <p>Are you sure you want to disable two-factor authentication? You will no longer need to enter a code when logging in.</p>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> <strong>Enhanced Security:</strong> 2FA adds an extra layer of protection to your account.
+                    </div>
+                    <p>When enabled, you'll receive a one-time code via email each time you login. This prevents unauthorized access even if someone knows your password.</p>
+                {% endif %}
+                
+                <form id="toggle2FAForm" onsubmit="return false;">
+                    <div class="mb-3">
+                        <label for="2fa_password" class="form-label"><strong>Confirm Your Password</strong></label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="2fa_password" 
+                               name="password" 
+                               placeholder="Enter your password"
+                               autocomplete="current-password"
+                               required 
+                               autofocus>
+                    </div>
+                </form>
+                
+                <!-- OTP Verification (shown after enabling) -->
+                <div id="otpVerificationSection" style="display: none;">
+                    <hr>
+                    <div class="alert alert-success">
+                        <i class="fas fa-envelope"></i> Verification code sent to <strong>{{ user.email }}</strong>
+                    </div>
+                    <form id="verify2FASetupForm">
+                        <div class="mb-3">
+                            <label for="setup_otp_code" class="form-label">Enter Verification Code</label>
+                            <input type="text" class="form-control text-center" id="setup_otp_code" name="otp_code" 
+                                   maxlength="6" pattern="[0-9]{6}" placeholder="000000" 
+                                   style="letter-spacing: 5px; font-size: 20px; font-family: 'Courier New', monospace;" required>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn {% if user.two_factor_enabled %}btn-danger{% else %}btn-success{% endif %}" 
+                        id="confirm2FAToggle">
+                    {% if user.two_factor_enabled %}
+                        <i class="fas fa-times-circle"></i> Disable 2FA
+                    {% else %}
+                        <i class="fas fa-shield-alt"></i> Enable 2FA
+                    {% endif %}
+                </button>
+                <button type="button" class="btn btn-success" id="confirmOTPSetup" style="display: none;">
+                    <i class="fas fa-check"></i> Verify & Enable 2FA
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Backup Codes Modal -->
+<div class="modal fade" id="backupCodesModal" tabindex="-1" aria-labelledby="backupCodesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="backupCodesModalLabel">
+                    <i class="fas fa-key"></i> Backup Codes
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> <strong>Important:</strong> 
+                    Save these backup codes in a secure place. Each code can only be used once.
+                </div>
+                
+                <div id="backupCodesList" class="p-3 bg-light rounded" style="display: none;">
+                    <div class="text-center mb-3">
+                        <strong>Your Backup Codes:</strong>
+                    </div>
+                    <div id="codesList" class="row text-center" style="font-family: 'Courier New', monospace;"></div>
+                </div>
+                
+                <form id="regenerateCodesForm">
+                    <div class="mb-3">
+                        <label for="backup_password" class="form-label">Confirm Password to Generate Codes</label>
+                        <input type="password" class="form-control" id="backup_password" name="password" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="regenerateCodesBtn">
+                    <i class="fas fa-redo"></i> Generate New Codes
+                </button>
+                <button type="button" class="btn btn-success" id="downloadCodesBtn" style="display: none;">
+                    <i class="fas fa-download"></i> Download Codes
+                </button>
+                <button type="button" class="btn btn-info" id="printCodesBtn" style="display: none;">
+                    <i class="fas fa-print"></i> Print Codes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const is2FAEnabled = {{ 'true' if user.two_factor_enabled else 'false' }};
+    
+    // Toggle 2FA
+    document.getElementById('confirm2FAToggle').addEventListener('click', function() {
+        const password = document.getElementById('2fa_password').value;
+        
+        if (!password) {
+            alert('Please enter your password');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        const formData = new FormData();
+        formData.append('password', password);
+        formData.append('enable', is2FAEnabled ? 'false' : 'true');
+        
+        fetch('{{ url_for("auth.toggle_2fa") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.verify_required) {
+                    // Show OTP verification section
+                    document.getElementById('toggle2FAForm').style.display = 'none';
+                    document.getElementById('otpVerificationSection').style.display = 'block';
+                    document.getElementById('confirm2FAToggle').style.display = 'none';
+                    document.getElementById('confirmOTPSetup').style.display = 'block';
+                    document.getElementById('setup_otp_code').focus();
+                } else {
+                    alert(data.message);
+                    location.reload();
+                }
+            } else {
+                alert(data.message);
+                this.disabled = false;
+                this.innerHTML = is2FAEnabled ? '<i class="fas fa-times-circle"></i> Disable 2FA' : '<i class="fas fa-shield-alt"></i> Enable 2FA';
+            }
+        })
+        .catch(error => {
+            alert('An error occurred. Please try again.');
+            this.disabled = false;
+            this.innerHTML = is2FAEnabled ? '<i class="fas fa-times-circle"></i> Disable 2FA' : '<i class="fas fa-shield-alt"></i> Enable 2FA';
+        });
+    });
+    
+    // Verify OTP Setup
+    document.getElementById('confirmOTPSetup').addEventListener('click', function() {
+        const otpCode = document.getElementById('setup_otp_code').value.trim();
+        const verifyBtn = this;
+        
+        if (!otpCode || otpCode.length !== 6) {
+            alert('Please enter a valid 6-digit code');
+            return;
+        }
+        
+        // Disable button and show loading state
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+        
+        const formData = new FormData();
+        formData.append('otp_code', otpCode);
+        
+        fetch('{{ url_for("auth.verify_2fa_setup") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            
+            if (data.success) {
+                // Show backup codes
+                if (data.backup_codes && data.backup_codes.length > 0) {
+                    const codesList = document.getElementById('codesList');
+                    codesList.innerHTML = '';
+                    
+                    data.backup_codes.forEach(code => {
+                        const col = document.createElement('div');
+                        col.className = 'col-6 mb-2';
+                        col.innerHTML = `<div class="p-2 bg-white rounded border">${code}</div>`;
+                        codesList.appendChild(col);
+                    });
+                    
+                    document.getElementById('backupCodesList').style.display = 'block';
+                    document.getElementById('downloadCodesBtn').style.display = 'inline-block';
+                    document.getElementById('printCodesBtn').style.display = 'inline-block';
+                    
+                    // Store codes for download/print
+                    window.backupCodes = data.backup_codes;
+                    
+                    // Hide OTP section and verify button
+                    document.getElementById('otpVerificationSection').style.display = 'none';
+                    verifyBtn.style.display = 'none';
+                    
+                    alert('✅ 2FA has been enabled successfully! Please save your backup codes.');
+                } else {
+                    alert(data.message || '2FA enabled successfully!');
+                    setTimeout(() => location.reload(), 1000);
+                }
+            } else {
+                alert('❌ ' + (data.message || 'Invalid OTP code'));
+                // Re-enable button
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify & Enable 2FA';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ An error occurred. Please try again.');
+            // Re-enable button
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = '<i class="fas fa-check"></i> Verify & Enable 2FA';
+        });
+    });
+    
+    // Regenerate Backup Codes
+    document.getElementById('regenerateCodesBtn').addEventListener('click', function() {
+        const password = document.getElementById('backup_password').value;
+        
+        if (!password) {
+            alert('Please enter your password');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        
+        const formData = new FormData();
+        formData.append('password', password);
+        
+        fetch('{{ url_for("auth.regenerate_backup_codes") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const codesList = document.getElementById('codesList');
+                codesList.innerHTML = '';
+                
+                data.backup_codes.forEach(code => {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 mb-2';
+                    col.innerHTML = `<div class="p-2 bg-white rounded border">${code}</div>`;
+                    codesList.appendChild(col);
+                });
+                
+                document.getElementById('backupCodesList').style.display = 'block';
+                document.getElementById('downloadCodesBtn').style.display = 'inline-block';
+                document.getElementById('printCodesBtn').style.display = 'inline-block';
+                document.getElementById('regenerateCodesForm').style.display = 'none';
+                
+                // Store codes for download/print
+                window.backupCodes = data.backup_codes;
+                
+                alert(data.message);
+            } else {
+                alert(data.message);
+            }
+            
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-redo"></i> Generate New Codes';
+        })
+        .catch(error => {
+            alert('An error occurred. Please try again.');
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-redo"></i> Generate New Codes';
+        });
+    });
+    
+    // Download Backup Codes
+    document.getElementById('downloadCodesBtn').addEventListener('click', function() {
+        if (!window.backupCodes) return;
+        
+        const content = `Food Order System - Backup Codes
+Generated: ${new Date().toLocaleString()}
+
+IMPORTANT: Save these codes in a secure place!
+Each code can only be used once.
+
+${window.backupCodes.map((code, index) => `${index + 1}. ${code}`).join('\n')}
+
+Do not share these codes with anyone.
+`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'backup-codes-' + new Date().getTime() + '.txt';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    });
+    
+    // Print Backup Codes
+    document.getElementById('printCodesBtn').addEventListener('click', function() {
+        if (!window.backupCodes) return;
+        
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Backup Codes</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 40px; }
+                    h1 { color: #333; }
+                    .codes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+                    .code { padding: 10px; border: 2px solid #333; text-align: center; font-family: 'Courier New', monospace; font-size: 16px; }
+                    .warning { background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin: 20px 0; }
+                </style>
+            </head>
+            <body>
+                <h1>Food Order System - Backup Codes</h1>
+                <p>Generated: ${new Date().toLocaleString()}</p>
+                <div class="warning">
+                    <strong>IMPORTANT:</strong> Save these codes in a secure place!<br>
+                    Each code can only be used once.<br>
+                    Do not share these codes with anyone.
+                </div>
+                <div class="codes">
+                    ${window.backupCodes.map(code => `<div class="code">${code}</div>`).join('')}
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    });
+    
+    // Auto-format OTP input
+    document.getElementById('setup_otp_code').addEventListener('input', function(e) {
+        this.value = this.value.replace(/\D/g, '');
+    });
+    
+    // Force password input to be interactive
+    const passwordField = document.getElementById('2fa_password');
+    if (passwordField) {
+        // Remove any blocking events
+        passwordField.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+        }, true);
+        
+        passwordField.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.focus();
+        }, true);
+        
+        passwordField.addEventListener('focus', function(e) {
+            this.style.backgroundColor = '#fff';
+            this.style.pointerEvents = 'auto';
+        });
+    }
+    
+    // Fix modal input focus issue
+    const toggle2FAModal = document.getElementById('toggle2FAModal');
+    toggle2FAModal.addEventListener('shown.bs.modal', function () {
+        const passwordInput = document.getElementById('2fa_password');
+        if (passwordInput) {
+            // Clear any previous value
+            passwordInput.value = '';
+            
+            // Remove any disabled/readonly attributes
+            passwordInput.removeAttribute('disabled');
+            passwordInput.removeAttribute('readonly');
+            
+            // Force enable pointer events
+            passwordInput.style.pointerEvents = 'auto';
+            passwordInput.style.userSelect = 'text';
+            passwordInput.style.cursor = 'text';
+            
+            // Make sure it's editable
+            passwordInput.readOnly = false;
+            passwordInput.disabled = false;
+            
+            // Force focus with multiple attempts
+            setTimeout(() => {
+                passwordInput.focus();
+                passwordInput.click();
+            }, 100);
+            
+            setTimeout(() => {
+                passwordInput.focus();
+            }, 300);
+        }
+        
+        // Fix modal backdrop click-through
+        const modalBackdrop = document.querySelector('.modal-backdrop');
+        if (modalBackdrop) {
+            modalBackdrop.style.pointerEvents = 'none';
+        }
+        
+        // Make sure modal content is clickable
+        const modalContent = this.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.style.pointerEvents = 'auto';
+        }
+    });
+    
+    // Reset form when modal is hidden
+    toggle2FAModal.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('toggle2FAForm').style.display = 'block';
+        document.getElementById('otpVerificationSection').style.display = 'none';
+        document.getElementById('confirm2FAToggle').style.display = 'block';
+        document.getElementById('confirmOTPSetup').style.display = 'none';
+        document.getElementById('2fa_password').value = '';
+        document.getElementById('setup_otp_code').value = '';
+    });
+});
+</script>
+
 <style>
 .profile-container {
     min-height: 80vh;
@@ -115,6 +606,75 @@
 }
 
 .profile-container .form-control:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Fix modal z-index issues */
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+/* Ensure input fields are interactive in modals */
+.modal input[type="password"],
+.modal input[type="text"] {
+    position: relative !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    cursor: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+}
+
+.modal-content {
+    position: relative !important;
+    z-index: 1056 !important;
+    pointer-events: auto !important;
+}
+
+/* Make sure form elements are clickable */
+.modal-body {
+    position: relative !important;
+    z-index: 2 !important;
+    pointer-events: auto !important;
+}
+
+.modal-body form {
+    position: relative !important;
+    z-index: 3 !important;
+    pointer-events: auto !important;
+}
+
+.modal-body .form-control {
+    background-color: #fff !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    user-select: text !important;
+}
+
+.modal-body .form-control:focus {
+    outline: 2px solid #0d6efd !important;
+    border-color: #86b7fe !important;
+}
+
+/* Fix for any overlay issues */
+.modal-backdrop {
+    pointer-events: none !important;
+}
+
+#toggle2FAModal .modal-dialog {
+    pointer-events: auto !important;
+}
+
+#toggle2FAModal input {
+    pointer-events: auto !important;
+}
     background-color: #e9ecef;
     cursor: not-allowed;
 }

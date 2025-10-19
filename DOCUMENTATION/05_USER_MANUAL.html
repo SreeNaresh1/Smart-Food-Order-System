@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manual - Smart Food Ordering System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: -40px -40px 40px -40px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .meta {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .toc h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc ul li {
+            padding: 5px 0;
+        }
+
+        .toc ul li a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc ul li a:hover {
+            color: #667eea;
+        }
+
+        h1 {
+            color: #667eea;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h2 {
+            color: #764ba2;
+            margin: 25px 0 15px 0;
+            padding-left: 10px;
+            border-left: 4px solid #764ba2;
+        }
+
+        h3 {
+            color: #555;
+            margin: 20px 0 10px 0;
+        }
+
+        h4 {
+            color: #666;
+            margin: 15px 0 10px 0;
+        }
+
+        p {
+            margin: 10px 0;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin: 10px 0 10px 30px;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        .code-block, pre {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .icon {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+
+        .button-example {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 2px solid #ddd;
+            color: #777;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+
+        .download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <a href="#" class="download-btn no-print" onclick="window.print(); return false;">📥 Print / Save as PDF</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>📱 User Manual</h1>
+            <h2>Smart Food Ordering System</h2>
+            <div class="meta">
+                <p><strong>Version:</strong> 1.0 | <strong>Last Updated:</strong> October 18, 2025</p>
+                <p><strong>Platform:</strong> Web Application</p>
+            </div>
+        </div>
+
+        <div class="toc">
+            <h2>📋 Table of Contents</h2>
+            <ul>
+                <li><a href="#introduction">1. Introduction</a></li>
+                <li><a href="#getting-started">2. Getting Started</a></li>
+                <li><a href="#customer-guide">3. Customer Guide</a></li>
+                <li><a href="#employee-guide">4. Employee Guide</a></li>
+                <li><a href="#supervisor-guide">5. Supervisor Guide</a></li>
+                <li><a href="#admin-guide">6. Admin Guide</a></li>
+                <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+                <li><a href="#faq">8. FAQ</a></li>
+            </ul>
+        </div>
+
+        <!-- Section 1: Introduction -->
+        <div class="section" id="introduction">
+            <h1>🎯 1. Introduction</h1>
+            
+            <h2>What is Smart Food Ordering System?</h2>
+            <p>The Smart Food Ordering System is a comprehensive web-based application designed to streamline the process of ordering food, managing kitchen operations, tracking deliveries, and analyzing business performance.</p>
+
+            <h2>Key Features</h2>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <strong>👥 Multi-Role Access</strong>
+                    <p>Admin, Supervisor, Employee, Customer</p>
+                </div>
+                <div class="feature-item">
+                    <strong>📍 Real-time Order Tracking</strong>
+                    <p>Track your order from preparation to delivery</p>
+                </div>
+                <div class="feature-item">
+                    <strong>💳 Secure Payments</strong>
+                    <p>Multiple payment options with secure processing</p>
+                </div>
+                <div class="feature-item">
+                    <strong>📋 Menu Management</strong>
+                    <p>Dynamic menu with categories and filters</p>
+                </div>
+                <div class="feature-item">
+                    <strong>📊 Reporting & Analytics</strong>
+                    <p>Comprehensive business insights</p>
+                </div>
+                <div class="feature-item">
+                    <strong>📱 Responsive Design</strong>
+                    <p>Works on desktop, tablet, and mobile devices</p>
+                </div>
+            </div>
+
+            <h2>System Requirements</h2>
+            <div class="info-box">
+                <h4>For Users (Customers/Employees):</h4>
+                <ul>
+                    <li>Modern web browser (Chrome, Firefox, Edge, Safari)</li>
+                    <li>Internet connection</li>
+                    <li>Screen resolution: Minimum 375x667 (mobile) to 1920x1080 (desktop)</li>
+                </ul>
+            </div>
+            <div class="info-box">
+                <h4>For Administrators:</h4>
+                <ul>
+                    <li>Same as above</li>
+                    <li>Additional privileges for system management</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 2: Getting Started -->
+        <div class="section" id="getting-started">
+            <h1>🚀 2. Getting Started</h1>
+
+            <h2>2.1 Accessing the System</h2>
+            <ol>
+                <li>Open your web browser</li>
+                <li>Navigate to: <code>http://localhost:5000</code> (or your deployed URL)</li>
+                <li>You'll see the landing page</li>
+            </ol>
+
+            <h2>2.2 Registration (New Users)</h2>
+            <h3>For Customers:</h3>
+            <ol>
+                <li>Click <strong>"Register here"</strong> on the login page</li>
+                <li>Fill in the registration form:</li>
+            </ol>
+            <div class="code-block">
+Full Name: Your full name
+Email: your.email@example.com
+Phone: Your contact number
+Password: Create a strong password
+Confirm Password: Re-enter password
+Address: Your delivery address
+            </div>
+            <ol start="3">
+                <li>Click <strong>"Register"</strong></li>
+                <li>You'll be redirected to login page</li>
+                <li>Login with your credentials</li>
+            </ol>
+            <div class="warning-box">
+                <strong>⚠️ Note:</strong> Admin, Supervisor, and Employee accounts are created by administrators only.
+            </div>
+
+            <h2>2.3 Login</h2>
+            <div class="success-box">
+                <strong>✅ You can login using EITHER:</strong>
+                <ul>
+                    <li>Your <strong>Email Address</strong>, OR</li>
+                    <li>Your <strong>Username</strong> (the name you registered with)</li>
+                </ul>
+            </div>
+
+            <h3>Steps:</h3>
+            <ol>
+                <li>Go to login page</li>
+                <li>Enter your username OR email</li>
+                <li>Enter your password</li>
+                <li>Click <strong>"Login"</strong></li>
+            </ol>
+
+            <h3>Examples:</h3>
+            <div class="code-block">
+Option 1 - Login with Email:
+Username or Email: john@example.com
+Password: ••••••••
+
+Option 2 - Login with Username:
+Username or Email: John Doe
+Password: ••••••••
+            </div>
+
+            <h2>2.4 First-Time Login</h2>
+            <p>After first login:</p>
+            <ol>
+                <li>You'll be directed to your role-specific dashboard</li>
+                <li>Complete your profile (if needed)</li>
+                <li>Familiarize yourself with the navigation menu</li>
+            </ol>
+        </div>
+
+        <!-- Section 3: Customer Guide -->
+        <div class="section" id="customer-guide">
+            <h1>🛍️ 3. Customer Guide</h1>
+
+            <h2>3.1 Dashboard Overview</h2>
+            <p>After login, you'll see:</p>
+            <ul>
+                <li><strong>Welcome Message:</strong> Personalized greeting</li>
+                <li><strong>Quick Actions:</strong> Fast access to key features</li>
+                <li><strong>Recent Orders:</strong> Your latest orders</li>
+                <li><strong>Order Statistics:</strong> Your order history summary</li>
+            </ul>
+
+            <h2>3.2 Browsing the Menu</h2>
+            <h3>Step 1: Access Menu</h3>
+            <ul>
+                <li>Click <strong>"Menu"</strong> in navigation bar</li>
+                <li>Or click <strong>"Browse Menu"</strong> on dashboard</li>
+            </ul>
+
+            <h3>Step 2: Browse Items</h3>
+            <ul>
+                <li>View all available food items</li>
+                <li>See item details: name, price, description, image</li>
+                <li>Check availability status</li>
+            </ul>
+
+            <h3>Step 3: Filter Items (Optional)</h3>
+            <ul>
+                <li><strong>By Category:</strong> Appetizers, Main Course, Desserts, Beverages</li>
+                <li><strong>By Type:</strong> Vegetarian, Non-Vegetarian, Vegan</li>
+                <li><strong>By Price:</strong> Sort by price (low to high, high to low)</li>
+                <li><strong>Special Tags:</strong> Popular items, New items, Discounted items</li>
+            </ul>
+
+            <h2>3.3 Adding Items to Cart</h2>
+            <h3>Method 1: Quick Add</h3>
+            <ol>
+                <li>Find item you want</li>
+                <li>Select quantity using <strong>+</strong> / <strong>-</strong> buttons</li>
+                <li>Click <strong>"Add to Cart"</strong> button</li>
+                <li>See confirmation message</li>
+            </ol>
+
+            <h3>Method 2: Item Details</h3>
+            <ol>
+                <li>Click on item card for details</li>
+                <li>View full description and images</li>
+                <li>Select quantity</li>
+                <li>Click <strong>"Add to Cart"</strong></li>
+            </ol>
+
+            <div class="info-box">
+                <strong>💡 Tip:</strong> Cart icon shows number of items in cart (top-right corner)
+            </div>
+
+            <h2>3.4 Managing Your Cart</h2>
+            <h3>View Cart:</h3>
+            <ol>
+                <li>Click cart icon or <strong>"View Cart"</strong> button</li>
+                <li>See all items in cart</li>
+            </ol>
+
+            <h3>Update Cart:</h3>
+            <ul>
+                <li><strong>Change Quantity:</strong> Use +/- buttons or enter number</li>
+                <li><strong>Remove Item:</strong> Click trash/remove icon</li>
+                <li><strong>Clear Cart:</strong> Remove all items at once</li>
+            </ul>
+
+            <h3>Cart Summary:</h3>
+            <div class="code-block">
+Items: 3
+Subtotal: ₹45.00
+Tax (10%): ₹4.50
+Delivery Fee: ₹5.00
+────────────────
+Total: ₹54.50
+            </div>
+
+            <h2>3.5 Placing an Order</h2>
+            <h3>Step 1: Review Cart</h3>
+            <ul>
+                <li>Ensure all items are correct</li>
+                <li>Check quantities and prices</li>
+                <li>Click <strong>"Proceed to Checkout"</strong></li>
+            </ul>
+
+            <h3>Step 2: Enter Delivery Details</h3>
+            <div class="code-block">
+Delivery Address: [Your address]
+Contact Phone: [Your phone]
+Special Instructions: [Optional notes]
+  Example: "Please ring doorbell"
+           "Extra napkins please"
+            </div>
+
+            <h3>Step 3: Select Payment Method</h3>
+            <ul>
+                <li><strong>Cash on Delivery:</strong> Pay when order arrives</li>
+                <li><strong>Card Payment:</strong> Credit/Debit card</li>
+                <li><strong>Online Payment:</strong> Digital wallets, UPI</li>
+            </ul>
+
+            <h3>Step 4: Review Order</h3>
+            <ul>
+                <li>Check all details carefully</li>
+                <li>Review total amount</li>
+                <li>Read terms and conditions</li>
+            </ul>
+
+            <h3>Step 5: Confirm Order</h3>
+            <ul>
+                <li>Click <strong>"Place Order"</strong> button</li>
+                <li>Wait for confirmation</li>
+                <li>See order confirmation page with Order ID</li>
+            </ul>
+
+            <div class="success-box">
+                <h4>✅ Order Placed Successfully!</h4>
+                <div class="code-block">
+Order ID: #12345
+Estimated Delivery: 30-45 minutes
+Total Amount: ₹54.50
+Payment Method: Cash on Delivery
+
+Track your order in "My Orders" section
+                </div>
+            </div>
+
+            <h2>3.6 Tracking Your Orders</h2>
+            <h3>View All Orders:</h3>
+            <ol>
+                <li>Click <strong>"My Orders"</strong> in navigation</li>
+                <li>See list of all your orders (newest first)</li>
+            </ol>
+
+            <h3>Order Information Displayed:</h3>
+            <div class="code-block">
+Order #12345
+Date: October 18, 2025 - 2:30 PM
+Status: [Preparing] [Ready] [Out for Delivery] [Delivered]
+Items: Pizza (2), Coke (1)
+Total: ₹54.50
+            </div>
+
+            <h3>Track Order Status:</h3>
+            <table>
+                <tr>
+                    <th>Status</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>🟡 Pending</td>
+                    <td>Order received, waiting for confirmation</td>
+                </tr>
+                <tr>
+                    <td>🔵 Preparing</td>
+                    <td>Being prepared in kitchen</td>
+                </tr>
+                <tr>
+                    <td>🟢 Ready</td>
+                    <td>Ready for pickup/delivery</td>
+                </tr>
+                <tr>
+                    <td>🚚 Out for Delivery</td>
+                    <td>On the way</td>
+                </tr>
+                <tr>
+                    <td>✅ Delivered</td>
+                    <td>Completed</td>
+                </tr>
+            </table>
+
+            <h2>3.7 Providing Feedback</h2>
+            <h3>After Order Delivery:</h3>
+            <ol>
+                <li>Go to <strong>"My Orders"</strong></li>
+                <li>Find completed order</li>
+                <li>Click <strong>"Give Feedback"</strong> or <strong>"Rate Order"</strong></li>
+            </ol>
+
+            <h3>Feedback Form:</h3>
+            <div class="code-block">
+Rating: ⭐⭐⭐⭐⭐ (1-5 stars)
+
+Comments: [Your feedback]
+Example: "Great food! Delivered on time."
+         "Pizza was cold. Needs improvement."
+            </div>
+
+            <div class="info-box">
+                <h4>Why Feedback Matters:</h4>
+                <ul>
+                    <li>Helps improve service quality</li>
+                    <li>Influences menu decisions</li>
+                    <li>Helps other customers</li>
+                    <li>Management reviews all feedback</li>
+                </ul>
+            </div>
+
+            <h2>3.8 Managing Your Profile</h2>
+            <h3>View Profile:</h3>
+            <ol>
+                <li>Click your name/profile icon (top-right)</li>
+                <li>Select <strong>"My Profile"</strong></li>
+            </ol>
+
+            <h3>Edit Profile:</h3>
+            <div class="code-block">
+Full Name: [Your name]
+Email: [Your email] (cannot change)
+Phone: [Your phone]
+Address: [Your address]
+            </div>
+
+            <h3>Change Password:</h3>
+            <div class="code-block">
+Current Password: [Enter current]
+New Password: [Enter new password]
+Confirm Password: [Re-enter new password]
+            </div>
+        </div>
+
+        <!-- Section 4: Employee Guide -->
+        <div class="section" id="employee-guide">
+            <h1>👨‍🍳 4. Employee Guide</h1>
+
+            <h2>4.1 Employee Dashboard</h2>
+            <p>After login, you'll see:</p>
+            <ul>
+                <li><strong>Assigned Orders:</strong> Orders assigned to you</li>
+                <li><strong>Tasks:</strong> Your pending tasks</li>
+                <li><strong>Performance:</strong> Your completion statistics</li>
+                <li><strong>Quick Actions:</strong> Fast access to common tasks</li>
+            </ul>
+
+            <h2>4.2 Viewing Assigned Orders</h2>
+            <h3>Access Your Orders:</h3>
+            <ol>
+                <li>Dashboard shows <strong>"My Assignments"</strong></li>
+                <li>Or click <strong>"Assigned Orders"</strong> in menu</li>
+            </ol>
+
+            <h2>4.3 Updating Order Status</h2>
+            <h3>Kitchen Staff Workflow:</h3>
+            
+            <div class="info-box">
+                <h4>Step 1: Start Preparation</h4>
+                <ol>
+                    <li>View new order</li>
+                    <li>Check items required</li>
+                    <li>Click <strong>"Start Preparing"</strong></li>
+                    <li>Status changes to <strong>"Preparing"</strong></li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h4>Step 2: During Preparation</h4>
+                <ul>
+                    <li>Follow order requirements</li>
+                    <li>Check special instructions</li>
+                    <li>Prepare items carefully</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Step 3: Mark as Ready</h4>
+                <ol>
+                    <li>When food is ready</li>
+                    <li>Click <strong>"Mark as Ready"</strong></li>
+                    <li>Status changes to <strong>"Ready"</strong></li>
+                    <li>Delivery team is notified</li>
+                </ol>
+            </div>
+
+            <h3>Delivery Staff Workflow:</h3>
+            
+            <div class="info-box">
+                <h4>Step 1: Accept Delivery</h4>
+                <ol>
+                    <li>See orders ready for delivery</li>
+                    <li>Click <strong>"Accept Delivery"</strong></li>
+                    <li>Status changes to <strong>"Out for Delivery"</strong></li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h4>Step 2: During Delivery</h4>
+                <ul>
+                    <li>Check customer address</li>
+                    <li>Contact customer if needed (phone provided)</li>
+                    <li>Follow special instructions</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4>Step 3: Complete Delivery</h4>
+                <ol>
+                    <li>Deliver food to customer</li>
+                    <li>Collect payment (if Cash on Delivery)</li>
+                    <li>Click <strong>"Mark as Delivered"</strong></li>
+                    <li>Status changes to <strong>"Delivered"</strong></li>
+                </ol>
+            </div>
+
+            <h2>4.4 Performance Tracking</h2>
+            <h3>View Your Stats:</h3>
+            <div class="code-block">
+Today's Performance:
+- Orders Completed: 15
+- Average Time: 28 minutes
+- Customer Rating: 4.7/5
+- On-Time Delivery: 92%
+            </div>
+        </div>
+
+        <!-- Section 5: Supervisor Guide -->
+        <div class="section" id="supervisor-guide">
+            <h1>👔 5. Supervisor Guide</h1>
+
+            <h2>5.1 Supervisor Dashboard</h2>
+            <p>After login, you'll see:</p>
+            <ul>
+                <li><strong>Pending Orders:</strong> Orders needing assignment</li>
+                <li><strong>Active Orders:</strong> Currently in progress</li>
+                <li><strong>Employee Status:</strong> Staff availability</li>
+                <li><strong>Performance Metrics:</strong> Key statistics</li>
+                <li><strong>System Alerts:</strong> Important notifications</li>
+            </ul>
+
+            <h2>5.2 Order Management</h2>
+            <h3>View All Orders:</h3>
+            <ol>
+                <li>Dashboard shows all orders</li>
+                <li>Filter by status: Pending, Preparing, Ready, Out for Delivery, Completed</li>
+            </ol>
+
+            <h2>5.3 Assigning Orders to Employees</h2>
+            <h3>Manual Assignment:</h3>
+            <ol>
+                <li>Go to <strong>"Order Management"</strong></li>
+                <li>Find pending order</li>
+                <li>Click <strong>"Assign"</strong> button</li>
+                <li>See list of available employees</li>
+                <li>Select employee based on workload and availability</li>
+                <li>Click <strong>"Assign"</strong></li>
+            </ol>
+
+            <table>
+                <tr>
+                    <th>Employee Name</th>
+                    <th>Current Load</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>John Smith</td>
+                    <td>3 orders</td>
+                    <td>Available</td>
+                </tr>
+                <tr>
+                    <td>Jane Doe</td>
+                    <td>5 orders</td>
+                    <td>Busy</td>
+                </tr>
+                <tr>
+                    <td>Mike Johnson</td>
+                    <td>2 orders</td>
+                    <td>Available</td>
+                </tr>
+            </table>
+
+            <h2>5.4 Reporting</h2>
+            <h3>Available Reports:</h3>
+            <ul>
+                <li><strong>Sales Report:</strong> Daily/Weekly/Monthly sales</li>
+                <li><strong>Order Report:</strong> Order statistics</li>
+                <li><strong>Employee Performance:</strong> Staff efficiency</li>
+                <li><strong>Customer Analysis:</strong> Customer behavior</li>
+                <li><strong>Menu Analysis:</strong> Popular items</li>
+                <li><strong>Delivery Performance:</strong> Delivery metrics</li>
+            </ul>
+        </div>
+
+        <!-- Section 6: Admin Guide -->
+        <div class="section" id="admin-guide">
+            <h1>👨‍💼 6. Admin Guide</h1>
+
+            <h2>6.1 Admin Dashboard</h2>
+            <p>After login, you'll see:</p>
+            <ul>
+                <li><strong>System Overview:</strong> Complete system status</li>
+                <li><strong>User Management:</strong> User statistics</li>
+                <li><strong>Order Statistics:</strong> Order trends</li>
+                <li><strong>Revenue Metrics:</strong> Financial overview</li>
+                <li><strong>System Health:</strong> Performance indicators</li>
+            </ul>
+
+            <h2>6.2 User Management</h2>
+            <h3>Add New User:</h3>
+            <ol>
+                <li>Click <strong>"Add User"</strong> button</li>
+                <li>Fill in details: Name, Email, Phone, Role, Password</li>
+                <li>Click <strong>"Create User"</strong></li>
+            </ol>
+
+            <h3>User Roles:</h3>
+            <ul>
+                <li><strong>Admin:</strong> Full system access</li>
+                <li><strong>Supervisor:</strong> Manage orders and employees</li>
+                <li><strong>Employee:</strong> Handle assigned tasks</li>
+                <li><strong>Customer:</strong> Place orders</li>
+            </ul>
+
+            <h2>6.3 Menu Management</h2>
+            <h3>Add New Item:</h3>
+            <ol>
+                <li>Click <strong>"Add Menu Item"</strong></li>
+                <li>Fill in: Name, Description, Category, Price, Image</li>
+                <li>Set properties: Vegetarian, Spicy, Popular</li>
+                <li>Click <strong>"Save"</strong></li>
+            </ol>
+
+            <h2>6.4 System Settings</h2>
+            <h3>General Settings:</h3>
+            <div class="code-block">
+System Name: Smart Food Ordering System
+Contact Email: admin@foodsystem.com
+Business Hours: 9:00 AM - 10:00 PM
+Delivery Range: 10 km
+            </div>
+
+            <h3>Order Settings:</h3>
+            <div class="code-block">
+Minimum Order: ₹10
+Delivery Fee: ₹5
+Tax Rate: 10%
+Estimated Preparation Time: 30 minutes
+            </div>
+        </div>
+
+        <!-- Section 7: Troubleshooting -->
+        <div class="section" id="troubleshooting">
+            <h1>🔧 7. Troubleshooting</h1>
+
+            <h2>7.1 Login Issues</h2>
+            <div class="warning-box">
+                <h4>Problem: Cannot login with email</h4>
+                <strong>Solution:</strong>
+                <ol>
+                    <li>Verify email is correct</li>
+                    <li>Try using your username instead</li>
+                    <li>Check if Caps Lock is on</li>
+                    <li>Click "Forgot Password" to reset</li>
+                </ol>
+            </div>
+
+            <div class="warning-box">
+                <h4>Problem: "Invalid username/email or password"</h4>
+                <strong>Solution:</strong>
+                <ol>
+                    <li>Double-check your credentials</li>
+                    <li>Try the other login method (username vs email)</li>
+                    <li>Contact admin if issue persists</li>
+                </ol>
+            </div>
+
+            <h2>7.2 Order Issues</h2>
+            <div class="warning-box">
+                <h4>Problem: Cannot add item to cart</h4>
+                <strong>Solution:</strong>
+                <ol>
+                    <li>Check if item is available</li>
+                    <li>Refresh the page</li>
+                    <li>Clear browser cache</li>
+                    <li>Try different browser</li>
+                </ol>
+            </div>
+
+            <h2>7.3 Payment Issues</h2>
+            <div class="warning-box">
+                <h4>Problem: Payment failed</h4>
+                <strong>Solution:</strong>
+                <ol>
+                    <li>Check card details are correct</li>
+                    <li>Ensure sufficient balance</li>
+                    <li>Try different payment method</li>
+                    <li>Contact your bank</li>
+                </ol>
+            </div>
+
+            <h2>7.4 Performance Issues</h2>
+            <div class="warning-box">
+                <h4>Problem: Slow page loading</h4>
+                <strong>Solution:</strong>
+                <ol>
+                    <li>Check internet connection</li>
+                    <li>Clear browser cache and cookies</li>
+                    <li>Close unnecessary browser tabs</li>
+                    <li>Try different browser</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Section 8: FAQ -->
+        <div class="section" id="faq">
+            <h1>❓ 8. FAQ (Frequently Asked Questions)</h1>
+
+            <h2>General Questions</h2>
+            
+            <div class="info-box">
+                <h4>Q: Is registration free?</h4>
+                <p><strong>A:</strong> Yes, creating a customer account is completely free.</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Q: Can I login with both email and username?</h4>
+                <p><strong>A:</strong> Yes! You can use either your email address OR your username to login.</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Q: How do I know if my order was placed successfully?</h4>
+                <p><strong>A:</strong> You'll receive an order confirmation with Order ID immediately after placing the order. You'll also receive an email confirmation.</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Q: Can I cancel my order?</h4>
+                <p><strong>A:</strong> Yes, you can cancel within 5 minutes of placing the order. After that, contact support.</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Q: What payment methods are accepted?</h4>
+                <p><strong>A:</strong> Cash on Delivery, Credit/Debit Cards, and Online Payment (UPI, Wallets).</p>
+            </div>
+
+            <h2>Order Questions</h2>
+
+            <div class="info-box">
+                <h4>Q: What is the minimum order amount?</h4>
+                <p><strong>A:</strong> The minimum order is ₹10 (excluding delivery fee).</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Q: How long does delivery take?</h4>
+                <p><strong>A:</strong> Standard delivery time is 30-45 minutes. Actual time may vary based on location and order volume.</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Q: Do you deliver to my area?</h4>
+                <p><strong>A:</strong> We deliver within a 10 km radius. Enter your address at checkout to verify.</p>
+            </div>
+
+            <h2>Technical Questions</h2>
+
+            <div class="info-box">
+                <h4>Q: Which browsers are supported?</h4>
+                <p><strong>A:</strong> Chrome, Firefox, Edge, and Safari (latest versions)</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Q: Is there a mobile app?</h4>
+                <p><strong>A:</strong> Currently web-only. Mobile apps coming soon!</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Q: Why do I need to enable cookies?</h4>
+                <p><strong>A:</strong> Cookies are required for login sessions and cart functionality.</p>
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts & Status Icons -->
+        <div class="section">
+            <h1>📝 Appendix</h1>
+
+            <h2>Keyboard Shortcuts</h2>
+            <table>
+                <tr>
+                    <th>Shortcut</th>
+                    <th>Action</th>
+                </tr>
+                <tr>
+                    <td>Ctrl + M</td>
+                    <td>Open Menu</td>
+                </tr>
+                <tr>
+                    <td>Ctrl + O</td>
+                    <td>My Orders</td>
+                </tr>
+                <tr>
+                    <td>Ctrl + C</td>
+                    <td>View Cart</td>
+                </tr>
+                <tr>
+                    <td>Ctrl + L</td>
+                    <td>Logout</td>
+                </tr>
+                <tr>
+                    <td>Ctrl + /</td>
+                    <td>Search</td>
+                </tr>
+            </table>
+
+            <h2>Status Icons</h2>
+            <table>
+                <tr>
+                    <th>Icon</th>
+                    <th>Meaning</th>
+                </tr>
+                <tr>
+                    <td>🟡</td>
+                    <td>Pending</td>
+                </tr>
+                <tr>
+                    <td>🔵</td>
+                    <td>In Progress</td>
+                </tr>
+                <tr>
+                    <td>🟢</td>
+                    <td>Ready/Completed</td>
+                </tr>
+                <tr>
+                    <td>🚚</td>
+                    <td>Out for Delivery</td>
+                </tr>
+                <tr>
+                    <td>✅</td>
+                    <td>Delivered</td>
+                </tr>
+                <tr>
+                    <td>❌</td>
+                    <td>Cancelled</td>
+                </tr>
+            </table>
+
+            <h2>Support & Contact</h2>
+            <div class="info-box">
+                <p><strong>Email Support:</strong> support@foodsystem.com</p>
+                <p><strong>Phone:</strong> +1234567890</p>
+                <p><strong>Hours:</strong> 9:00 AM - 10:00 PM (Daily)</p>
+            </div>
+
+            <h2>Version History</h2>
+            <table>
+                <tr>
+                    <th>Version</th>
+                    <th>Date</th>
+                    <th>Changes</th>
+                </tr>
+                <tr>
+                    <td>1.0</td>
+                    <td>Oct 18, 2025</td>
+                    <td>Initial release</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="footer">
+            <h3>Thank you for using Smart Food Ordering System!</h3>
+            <p><em>For the best experience, please keep your browser updated.</em></p>
+            <p style="margin-top: 20px;">Document Version: 1.0 | Last Updated: October 18, 2025</p>
+            <p>© 2025 Smart Food Ordering System. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
