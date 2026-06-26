@@ -8,7 +8,7 @@ import sqlite3
 from functools import wraps
 
 # Create Flask app
-app = Flask(__name__)
+app = Flask(__name__, template_folder='frontend/templates', static_folder='frontend/static')
 
 # Configuration
 app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
@@ -27,23 +27,23 @@ app.config['MAIL_DEFAULT_SENDER'] = 'astrostarnaresh@gmail.com'
 mail = Mail(app)
 
 # Import models first
-from models import db, User, Order, OrderDetails, MenuItem, Payment, Feedback, Delivery, KitchenStaff, Recommendation
+from backend.models import db, User, Order, OrderDetails, MenuItem, Payment, Feedback, Delivery, KitchenStaff, Recommendation
 
 # Initialize SQLAlchemy with app
 db.init_app(app)
 
 # Import blueprints after db initialization
-from routes.auth import auth_bp
-from routes.menu import menu_bp
-from routes.orders import orders_bp
-from routes.users import users_bp
-from routes.payments import payments_bp
-from routes.feedback import feedback_bp
-from routes.delivery import delivery_bp
-from routes.kitchen import kitchen_bp
-from routes.recommendations import recommendations_bp
-from routes.reports import reports_bp
-from routes.admin_security import admin_security_bp
+from backend.routes.auth import auth_bp
+from backend.routes.menu import menu_bp
+from backend.routes.orders import orders_bp
+from backend.routes.users import users_bp
+from backend.routes.payments import payments_bp
+from backend.routes.feedback import feedback_bp
+from backend.routes.delivery import delivery_bp
+from backend.routes.kitchen import kitchen_bp
+from backend.routes.recommendations import recommendations_bp
+from backend.routes.reports import reports_bp
+from backend.routes.admin_security import admin_security_bp
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -217,7 +217,7 @@ def dashboard():
         
         # Get recommendations for customer
         try:
-            from routes.recommendations import get_user_recommendations
+            from backend.routes.recommendations import get_user_recommendations
             recommendations = get_user_recommendations(user.user_id)
             stats['recommendations'] = recommendations[:5]  # Top 5 recommendations
         except:
