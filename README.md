@@ -288,5 +288,4 @@ For technical support or questions about the implementation:
 ✅ **Production-Ready** with proper error handling
 
 ---
-
 **Built with ❤️ using Flask, SQLAlchemy, Bootstrap, and AI algorithms**
